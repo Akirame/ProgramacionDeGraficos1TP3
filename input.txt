@@ -1,2 +1,0 @@
-https://wiki.allegro.cc/index.php?title=Allegro_5_Tutorial/Input
-http://liballeg.org/a5docs/trunk/getting_started.html#event-queues-and-input

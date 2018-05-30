@@ -1,2 +1,5 @@
-Debug
-.vs
+\binaries
+\obj
+\.vs
+*.db
+*.opendb
