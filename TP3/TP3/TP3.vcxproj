@@ -19,7 +19,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Player.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Enemy.h" />
+    <ClInclude Include="Player.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{0C5AE3DD-F0C1-4B1F-9A03-1F222BC99A6F}</ProjectGuid>
@@ -99,7 +105,8 @@
       <AdditionalDependencies>allegro.lib;allegro_dialog-debug.lib;allegro_image.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)lib\Allegro\allegro_5.1.12_x86\bin\*-5.1.dll" "$(OutDir)" /y /s</Command>
+      <Command>xcopy "$(SolutionDir)lib\Allegro\allegro_5.1.12_x86\bin\*-5.1.dll" "$(OutDir)" /y /s
+xcopy "$(SolutionDir)assets" "$(OutDir)"  /y /s</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -113,7 +120,8 @@
       <AdditionalLibraryDirectories>$(SolutionDir)lib\Allegro\allegro_5.1.12_x86\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)lib\Allegro\allegro_5.1.12_x86\bin\*-5.1.dll" "$(OutDir)" /y /s</Command>
+      <Command>xcopy "$(SolutionDir)lib\Allegro\allegro_5.1.12_x86\bin\*-5.1.dll" "$(OutDir)" /y /s
+xcopy "$(SolutionDir)assets" "$(OutDir)"  /y /s</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -132,7 +140,8 @@
       <AdditionalLibraryDirectories>$(SolutionDir)lib\Allegro\allegro_5.1.12_x86\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)lib\Allegro\allegro_5.1.12_x86\bin\*.dll" "$(OutDir)" /y /s</Command>
+      <Command>xcopy "$(SolutionDir)lib\Allegro\allegro_5.1.12_x86\bin\*.dll" "$(OutDir)" /y /s
+xcopy "$(SolutionDir)assets" "$(OutDir)"  /y /s</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -150,7 +159,8 @@
       <AdditionalLibraryDirectories>$(SolutionDir)lib\Allegro\allegro_5.1.12_x86\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)lib\Allegro\allegro_5.1.12_x86\bin\*.dll" "$(OutDir)" /y /s</Command>
+      <Command>xcopy "$(SolutionDir)lib\Allegro\allegro_5.1.12_x86\bin\*.dll" "$(OutDir)" /y /s
+xcopy "$(SolutionDir)assets" "$(OutDir)"  /y /s</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

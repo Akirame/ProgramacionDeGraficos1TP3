@@ -2,27 +2,25 @@
 #include <allegro5/allegro.h>
 #include "allegro5/allegro_image.h"
 #include "allegro5/allegro_native_dialog.h"
+#include "Player.h"
+#include "Enemy.h"
 
 const float FPS = 60;
 const int SCREEN_W = 640;
 const int SCREEN_H = 480;
-const int BOUNCER_SIZE = 32;
-enum MYKEYS {
-	KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT
-};
+
+
+bool bounding_box_collision(int b1_x, int b1_y, int b1_w, int b1_h, int b2_x, int b2_y, int b2_w, int b2_h);
 
 int main(int argc, char **argv)
 {
 	ALLEGRO_DISPLAY *display = NULL;
 	ALLEGRO_EVENT_QUEUE *event_queue = NULL;
-	ALLEGRO_TIMER *timer = NULL;
-	ALLEGRO_BITMAP  *bloque = NULL;
-	ALLEGRO_BITMAP  *player = NULL;
-	float player_x = SCREEN_W / 2.0 - BOUNCER_SIZE / 2.0;
-	float player_y = SCREEN_H / 2.0 - BOUNCER_SIZE / 2.0;
-	bool key[4] = { false, false, false, false };
+	ALLEGRO_TIMER *timer = NULL;	
+	Player* player;
+	Enemy* enemy1;
+
 	bool redraw = true;
-	bool doexit = false;
 
 	if (!al_init()) {
 		fprintf(stderr, "failed to initialize allegro!\n");
@@ -52,27 +50,9 @@ int main(int argc, char **argv)
 			NULL, ALLEGRO_MESSAGEBOX_ERROR);
 		return 0;
 	}
-
-
-	bloque = al_load_bitmap("bloque.jpg");
-
-	if (!bloque) {
-		al_show_native_message_box(display, "Error", "Error", "Failed to load image!",
-			NULL, ALLEGRO_MESSAGEBOX_ERROR);
-		al_destroy_display(display);
-		return 0;
-	}
-
-	player = al_load_bitmap("player.jpg");
-
-	if (!player) {
-		al_show_native_message_box(display, "Error", "Error", "Failed to load image!",
-			NULL, ALLEGRO_MESSAGEBOX_ERROR);
-		al_destroy_display(display);
-		return 0;
-	}
-
 	
+	player = new Player(SCREEN_W, SCREEN_H);
+	enemy1 = new Enemy(SCREEN_W, SCREEN_W);
 
 	al_clear_to_color(al_map_rgb(255, 0, 255));
 
@@ -81,7 +61,8 @@ int main(int argc, char **argv)
 	event_queue = al_create_event_queue();
 	if (!event_queue) {
 		fprintf(stderr, "failed to create event_queue!\n");
-		al_destroy_bitmap(player);
+		delete player;
+		delete enemy1;
 		al_destroy_display(display);
 		al_destroy_timer(timer);
 		return -1;
@@ -99,91 +80,54 @@ int main(int argc, char **argv)
 
 	al_start_timer(timer);
 
-	while (!doexit)
+	while (1)
 	{
 		ALLEGRO_EVENT ev;
 		al_wait_for_event(event_queue, &ev);
 
 		if (ev.type == ALLEGRO_EVENT_TIMER) {
-			if (key[KEY_UP] && player_y >= 4.0) {
-				player_y -= 4.0;
-			}
-
-			if (key[KEY_DOWN] && player_y <= SCREEN_H - BOUNCER_SIZE - 4.0) {
-				player_y += 4.0;
-			}
-
-			if (key[KEY_LEFT] && player_x >= 4.0) {
-				player_x -= 4.0;
-			}
-
-			if (key[KEY_RIGHT] && player_x <= SCREEN_W - BOUNCER_SIZE - 4.0) {
-				player_x += 4.0;
-			}
-
+			player->Update(ev);
+			enemy1->Update(ev);
+			if (bounding_box_collision(player->GetX(), player->GetY(), player->GetWidht(), player->GetHeight(),
+				enemy1->GetX(), enemy1->GetY(), enemy1->GetWidht(), enemy1->GetHeight()))
+				break;
 			redraw = true;
 		}
 		else if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
 			break;
 		}
 		else if (ev.type == ALLEGRO_EVENT_KEY_DOWN) {
-			switch (ev.keyboard.keycode) {
-			case ALLEGRO_KEY_UP:
-				key[KEY_UP] = true;
-				break;
-
-			case ALLEGRO_KEY_DOWN:
-				key[KEY_DOWN] = true;
-				break;
-
-			case ALLEGRO_KEY_LEFT:
-				key[KEY_LEFT] = true;
-				break;
-
-			case ALLEGRO_KEY_RIGHT:
-				key[KEY_RIGHT] = true;
-				break;
-			}
+			player->Update(ev);
 		}
-		else if (ev.type == ALLEGRO_EVENT_KEY_UP) {
-			switch (ev.keyboard.keycode) {
-			case ALLEGRO_KEY_UP:
-				key[KEY_UP] = false;
-				break;
-
-			case ALLEGRO_KEY_DOWN:
-				key[KEY_DOWN] = false;
-				break;
-
-			case ALLEGRO_KEY_LEFT:
-				key[KEY_LEFT] = false;
-				break;
-
-			case ALLEGRO_KEY_RIGHT:
-				key[KEY_RIGHT] = false;
-				break;
-
-			case ALLEGRO_KEY_ESCAPE:
-				doexit = true;
-				break;
-			}
-		}
-
 		if (redraw && al_is_event_queue_empty(event_queue)) {
 			redraw = false;
 
 			al_clear_to_color(al_map_rgb(0, 0, 0));
 
-			al_draw_bitmap(player, player_x, player_y, 0);
+			al_draw_bitmap(player->GetBitmap(), player->GetX(), player->GetY(), 0);
 
 			al_flip_display();
 		}
 	}
 
-	al_destroy_bitmap(player);
+	delete player;
 	al_destroy_timer(timer);
 	al_destroy_display(display);
 	al_destroy_event_queue(event_queue);
 
 	return 0;
+}
+
+bool bounding_box_collision(int b1_x, int b1_y, int b1_w, int b1_h, int b2_x, int b2_y, int b2_w, int b2_h)
+{
+	if ((b1_x > b2_x + b2_w - 1) || // is b1 on the right side of b2?
+		(b1_y > b2_y + b2_h - 1) || // is b1 under b2?
+		(b2_x > b1_x + b1_w - 1) || // is b2 on the right side of b1?
+		(b2_y > b1_y + b1_h - 1))   // is b2 under b1?
+	{
+		// no collision
+		return false;
+	}
+	// collision
+	return true;
 }
