@@ -8,6 +8,8 @@ Player::Player(int _screenWidth, int _screenHeight)
 	screenHeight = _screenHeight;
 	x = screenWidth / 2 - width / 2;
 	y = screenHeight / 2 - height / 2;
+	bulletDir = dir(RIGHT);
+	bullet = new Bullet(screenWidth,screenHeight);
 	sprite = al_load_bitmap("assets/player.png");
 	if (!sprite)
 		fprintf(stderr, "failed to create player bitmap!\n");
@@ -17,23 +19,36 @@ Player::Player(int _screenWidth, int _screenHeight)
 Player::~Player()
 {
 	if (!sprite)
-		delete sprite;
+		delete sprite;	
 }
 void Player::Update(ALLEGRO_EVENT ev)
 {	
 		Movement(ev);	
-		OOB();
+		OOB();		
+		
 }
 void Player::Movement(ALLEGRO_EVENT ev)
 {
 	if (ev.keyboard.keycode == ALLEGRO_KEY_UP)
+	{
 		y -= 10;
+		bulletDir = dir(UP);
+	}
 	else if (ev.keyboard.keycode == ALLEGRO_KEY_DOWN)
+	{
 		y += 10;
+		bulletDir = dir(DOWN);
+	}
 	else if (ev.keyboard.keycode == ALLEGRO_KEY_LEFT)
+	{
 		x -= 10;
+		bulletDir = dir(LEFT);
+	}
 	else if (ev.keyboard.keycode == ALLEGRO_KEY_RIGHT)
+	{
 		x += 10;
+		bulletDir = dir(RIGHT);
+	}
 }
 void Player::SetX(float _x)
 {

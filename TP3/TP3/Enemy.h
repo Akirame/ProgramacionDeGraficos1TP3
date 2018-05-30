@@ -17,7 +17,7 @@ private:
 	float speed;
 	ALLEGRO_BITMAP* sprite = NULL;
 public:
-	Enemy(int screenWidth, int screenHeight);
+	Enemy(int screenWidth, int screenHeight, int startX, int startY);
 	~Enemy();
 	void SetX(float _x);
 	void SetY(float _y);

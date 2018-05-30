@@ -52,9 +52,9 @@ int main(int argc, char **argv)
 	}
 	
 	player = new Player(SCREEN_W, SCREEN_H);
-	enemy1 = new Enemy(SCREEN_W, SCREEN_W);
+	enemy1 = new Enemy(SCREEN_W, SCREEN_W,32,32);
 
-	al_clear_to_color(al_map_rgb(255, 0, 255));
+	
 
 	al_set_target_bitmap(al_get_backbuffer(display));
 
@@ -74,7 +74,7 @@ int main(int argc, char **argv)
 
 	al_register_event_source(event_queue, al_get_keyboard_event_source());
 
-	al_clear_to_color(al_map_rgb(0, 0, 0));
+	al_clear_to_color(al_map_rgb(0, 40, 0));
 
 	al_flip_display();
 
@@ -102,7 +102,7 @@ int main(int argc, char **argv)
 		if (redraw && al_is_event_queue_empty(event_queue)) {
 			redraw = false;
 
-			al_clear_to_color(al_map_rgb(0, 0, 0));
+			al_clear_to_color(al_map_rgb(0, 40, 0));
 
 			al_draw_bitmap(player->GetBitmap(), player->GetX(), player->GetY(), 0);
 			al_draw_bitmap(enemy1->GetBitmap(), enemy1->GetX(), enemy1->GetY(), 0);

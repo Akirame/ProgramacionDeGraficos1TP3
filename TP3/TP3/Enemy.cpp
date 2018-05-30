@@ -1,14 +1,14 @@
 #include "Enemy.h"
 
-Enemy::Enemy(int _screenWidth, int _screenHeight)
+Enemy::Enemy(int _screenWidth, int _screenHeight, int startX, int startY)
 {
 	width = 32;
 	height = 32;
-	speed = 10;
+	speed = 3;
 	screenWidth = _screenWidth;
 	screenHeight = _screenHeight;
-	x = screenWidth / 4 - width / 2;
-	y = screenHeight / 4 - height / 2;
+	x = startX;
+	y = startY;
 	sprite = al_load_bitmap("assets/enemy.png");
 	if (!sprite)
 		fprintf(stderr, "failed to create enemy bitmap!\n");

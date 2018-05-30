@@ -1,0 +1,11 @@
+-Commits no muy claros
+-Gitignore mal hecho.
+-Organización de carpetas desorganizada.
+-En el movimiento de player hay un Magic number "4.0" que no se sabe bien de que es
+-No copió los assets luego de compilar, si abro el juego desde el exe no funciona
+---------------
+
+-Cambie rutas de salidas y carpetas intermedias.
+-Cambie el Gitignore.
+-Arreglo Out Of Bounds, y eliminado el Magic number(sigo sin saber para que servía).
+-Agregue clase Player y Enemy.

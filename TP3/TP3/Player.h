@@ -4,6 +4,8 @@
 #include <iostream>
 #include <allegro5/allegro_image.h>
 #include <allegro5\allegro_native_dialog.h>
+#include "Bullet.h"
+
 class Player
 {
 private:
@@ -13,6 +15,8 @@ private:
 	int screenHeight;
 	float x;
 	float y;
+	dir bulletDir;
+	Bullet* bullet;
 	ALLEGRO_BITMAP* sprite = NULL;
 public:
 	Player(int screenWidth, int screenHeight);
@@ -27,7 +31,6 @@ public:
 	void Movement(ALLEGRO_EVENT ev);
 	void Update(ALLEGRO_EVENT ev);
 	void OOB();
-
 };
 #endif
 
