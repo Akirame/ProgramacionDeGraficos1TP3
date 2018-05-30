@@ -9,7 +9,7 @@ Enemy::Enemy(int _screenWidth, int _screenHeight)
 	screenHeight = _screenHeight;
 	x = screenWidth / 4 - width / 2;
 	y = screenHeight / 4 - height / 2;
-	sprite = al_load_bitmap("assets/bloque.jpg");
+	sprite = al_load_bitmap("assets/enemy.png");
 	if (!sprite)
 		fprintf(stderr, "failed to create enemy bitmap!\n");
 }

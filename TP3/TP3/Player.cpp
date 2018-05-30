@@ -8,7 +8,7 @@ Player::Player(int _screenWidth, int _screenHeight)
 	screenHeight = _screenHeight;
 	x = screenWidth / 2 - width / 2;
 	y = screenHeight / 2 - height / 2;
-	sprite = al_load_bitmap("assets/player.jpg");
+	sprite = al_load_bitmap("assets/player.png");
 	if (!sprite)
 		fprintf(stderr, "failed to create player bitmap!\n");
 }

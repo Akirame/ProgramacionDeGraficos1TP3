@@ -105,7 +105,7 @@ int main(int argc, char **argv)
 			al_clear_to_color(al_map_rgb(0, 0, 0));
 
 			al_draw_bitmap(player->GetBitmap(), player->GetX(), player->GetY(), 0);
-
+			al_draw_bitmap(enemy1->GetBitmap(), enemy1->GetX(), enemy1->GetY(), 0);
 			al_flip_display();
 		}
 	}
