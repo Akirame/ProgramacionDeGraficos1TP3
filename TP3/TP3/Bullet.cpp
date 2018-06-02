@@ -1,61 +1,67 @@
 #include "Bullet.h"
 
 
-Bullet::Bullet(int _screenWidth, int _screenHeight)
+Bullet::Bullet(int startX,int startY, int _screenWidth, int _screenHeight,dir _direction)
 {
+	alive = false;
 	width = 12;
 	height = 12;
 	screenWidth = _screenWidth;
 	screenHeight = _screenHeight;
 	x = screenWidth / 2 - width / 2;
 	y = screenHeight / 2 - height / 2;
+	direction = _direction;
 	speed = 5;
-	sprite = al_load_bitmap("assets/player.png");
+	sprite = al_load_bitmap("assets/bullet.png");
 	if (!sprite)
 		fprintf(stderr, "failed to create player bitmap!\n");
 }
-
-
 Bullet::~Bullet()
-{
-	if (!sprite)
-		delete sprite;
+{	
+	al_destroy_bitmap(sprite);
 }
 void Bullet::Update()
-{
-	Movement();
+{	
+	Movement();	
 	OOB();
+}
+void Bullet::Draw() const
+{
+	al_draw_bitmap(sprite, x, y, 0);
 }
 void Bullet::Movement()
 {	
-	if (direction == dir(UP))
+	if (direction == dir(BULLET_UP))
 	{
 		y -= speed;		
 	}
-	if (direction == dir(DOWN))
+	if (direction == dir(BULLET_DOWN))
 	{
 		y += speed;
 	}
-	if (direction == dir(LEFT))
+	if (direction == dir(BULLET_LEFT))
 	{
 		x -= speed;
 	}
-	if (direction == dir(RIGHT))
+	if (direction == dir(BULLET_RIGHT))
 	{
 		x += speed;
 	}
 }
-void Bullet::SetX(float _x)
+void Bullet::KillBullet() 
 {
-	x += _x;
+	alive = false;
 }
-void Bullet::SetY(float _y)
+void Bullet::OOB()
 {
-	y += _y;
-}
-void Bullet::SetDirection(dir _direction)
-{
-	direction = _direction;
+	if (y <= 0)
+		alive = false;
+	if (y >= screenHeight - height)
+		alive = false;
+	if (x <= 0)
+		alive = false;
+	if (x >= screenWidth - width)
+		alive = false;
 }
 float Bullet::GetX() const
 {
@@ -77,14 +83,14 @@ ALLEGRO_BITMAP* Bullet::GetBitmap() const
 {
 	return sprite;
 }
-void Bullet::OOB()
+bool Bullet::GetAlive()
 {
-	if (y <= 0)
-		delete this;
-	if (y >= screenHeight - height)
-		delete this;
-	if (x <= 0)
-		delete this;
-	if (x >= screenWidth - width)
-		delete this;
+	return alive;
+}
+void Bullet::Reset(int startX, int startY, dir _directions)
+{
+	alive = true;
+	x = startX;
+	y = startY;
+	direction = _directions;
 }

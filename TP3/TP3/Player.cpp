@@ -4,52 +4,101 @@ Player::Player(int _screenWidth, int _screenHeight)
 {
 	width = 32;
 	height = 32;
+	speed = 2;
 	screenWidth = _screenWidth;
 	screenHeight = _screenHeight;
 	x = screenWidth / 2 - width / 2;
 	y = screenHeight / 2 - height / 2;
-	bulletDir = dir(RIGHT);
-	bullet = new Bullet(screenWidth,screenHeight);
+	bulletDir = dir(BULLET_RIGHT);
+	bullet = new Bullet(x, y, screenWidth, screenHeight, bulletDir);
 	sprite = al_load_bitmap("assets/player.png");
 	if (!sprite)
 		fprintf(stderr, "failed to create player bitmap!\n");
 }
-
-
 Player::~Player()
-{
-	if (!sprite)
-		delete sprite;	
+{	
+	al_destroy_bitmap(sprite);
+	if(bullet)
+	delete bullet;
 }
 void Player::Update(ALLEGRO_EVENT ev)
 {	
 		Movement(ev);	
-		OOB();		
-		
+		Shoot(ev);		
+		OOB();
 }
 void Player::Movement(ALLEGRO_EVENT ev)
 {
-	if (ev.keyboard.keycode == ALLEGRO_KEY_UP)
+	if (ev.type == ALLEGRO_EVENT_KEY_DOWN)
 	{
-		y -= 10;
-		bulletDir = dir(UP);
+		if (ev.keyboard.keycode == ALLEGRO_KEY_A)
+			key[KEY_LEFT] = 1;
+		else if (ev.keyboard.keycode == ALLEGRO_KEY_D)
+			key[KEY_RIGHT] = 1;
+		else if (ev.keyboard.keycode == ALLEGRO_KEY_W)
+			key[KEY_UP] = 1;
+		else if (ev.keyboard.keycode == ALLEGRO_KEY_S)
+			key[KEY_DOWN] = 1;
 	}
-	else if (ev.keyboard.keycode == ALLEGRO_KEY_DOWN)
+	if (ev.type == ALLEGRO_EVENT_KEY_UP)
 	{
-		y += 10;
-		bulletDir = dir(DOWN);
+		if (ev.keyboard.keycode == ALLEGRO_KEY_A)
+			key[KEY_LEFT] = 0;
+		else if (ev.keyboard.keycode == ALLEGRO_KEY_D)
+			key[KEY_RIGHT] = 0;
+		else if (ev.keyboard.keycode == ALLEGRO_KEY_W)
+			key[KEY_UP] = 0;
+		else if (ev.keyboard.keycode == ALLEGRO_KEY_S)
+			key[KEY_DOWN] = 0;		
 	}
-	else if (ev.keyboard.keycode == ALLEGRO_KEY_LEFT)
+	if (key[KEY_LEFT])
 	{
-		x -= 10;
-		bulletDir = dir(LEFT);
+		x -= speed;
+		bulletDir = dir(BULLET_LEFT);
 	}
-	else if (ev.keyboard.keycode == ALLEGRO_KEY_RIGHT)
+	else if (key[KEY_RIGHT])
 	{
-		x += 10;
-		bulletDir = dir(RIGHT);
+		x += speed;
+		bulletDir = dir(BULLET_RIGHT);
 	}
+	else if (key[KEY_UP])
+	{
+		y -= speed;
+		bulletDir = dir(BULLET_UP);
+	}
+	else if (key[KEY_DOWN])
+	{
+		y += speed;
+		bulletDir = dir(BULLET_DOWN);
+	}	
 }
+void Player::Draw() const
+{
+	al_draw_bitmap(sprite, x, y, 0);
+	if (bullet->GetAlive())
+		bullet->Draw();
+}
+void Player::OOB()
+{
+	if (y <= 0)
+		y = 0;
+	if (y >= screenHeight - height)
+		y = screenHeight - height;
+	if (x <= 0)
+		x = 0;
+	if (x >= screenWidth - width)
+		x = screenWidth - width;
+}
+void Player::Shoot(ALLEGRO_EVENT ev)
+{
+	if (ev.keyboard.keycode == ALLEGRO_KEY_K && !bullet->GetAlive())
+	{
+		bullet->Reset(x, y, bulletDir);
+	}
+	if (bullet->GetAlive())
+		bullet->Update();
+}
+
 void Player::SetX(float _x)
 {
 	x += _x;
@@ -74,18 +123,11 @@ float Player::GetWidht() const
 {
 	return width;
 }
+Bullet* Player::GetBullet()
+{
+	return bullet;
+}
 ALLEGRO_BITMAP* Player::GetBitmap() const
 {
 	return sprite;
-}
-void Player::OOB()
-{
-	if (y <= 0)
-		y = 0;
-	if (y >= screenHeight - height)
-		y = screenHeight - height;
-	if (x <= 0)
-		x = 0;
-	if (x >= screenWidth - width)
-		x = screenWidth - width;
 }

@@ -6,6 +6,14 @@
 #include <allegro5\allegro_native_dialog.h>
 #include "Bullet.h"
 
+enum GAME_KEYS
+{
+	KEY_LEFT,
+	KEY_RIGHT,
+	KEY_UP,
+	KEY_DOWN
+};
+
 class Player
 {
 private:
@@ -13,24 +21,30 @@ private:
 	int height;
 	int screenWidth;
 	int screenHeight;
+	float speed;
 	float x;
 	float y;
+	int key[4] = { 0,0,0,0 };
 	dir bulletDir;
 	Bullet* bullet;
 	ALLEGRO_BITMAP* sprite = NULL;
 public:
 	Player(int screenWidth, int screenHeight);
 	~Player();
+
+	void Movement(ALLEGRO_EVENT ev);
+	void Update(ALLEGRO_EVENT ev);
+	void OOB();
+	void Draw() const;
+	void Shoot(ALLEGRO_EVENT ev);
 	void SetX(float _x);
 	void SetY(float _y);
 	float GetX() const;
 	float GetY() const;
 	float GetHeight() const;
 	float GetWidht() const;
+	Bullet* GetBullet();
 	ALLEGRO_BITMAP* GetBitmap() const;
-	void Movement(ALLEGRO_EVENT ev);
-	void Update(ALLEGRO_EVENT ev);
-	void OOB();
 };
 #endif
 
