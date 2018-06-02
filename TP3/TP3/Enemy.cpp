@@ -15,43 +15,73 @@ Enemy::Enemy(int _screenWidth, int _screenHeight, int startX, int startY)
 		fprintf(stderr, "failed to create enemy bitmap!\n");	
 }
 
-void Enemy::randDir()
+void Enemy::randDir(directions _dir[])
 {	
-	dir = static_cast<directions>(rand() % ENEMY_LAST);	
+	int randIndex = rand() % 5;
+	dir = _dir[randIndex];
 }
 Enemy::~Enemy()
 {	
 	al_destroy_bitmap(sprite);
 }
 void Enemy::Update(ALLEGRO_EVENT ev)
-{
+{	
 	Movement(ev);
+	OOB();
 }
 void Enemy::Draw() const
 {	
 	al_draw_bitmap(sprite, x, y, 0);
 }
-// si choca contra el costado derecho vuelve
+
 void Enemy::Movement(ALLEGRO_EVENT ev)
 {
 	if (ev.type == ALLEGRO_EVENT_TIMER) {
-		if (x < 0)
-			speed *= -1;
-		else if (x + width > screenWidth)
-			speed *= -1;
-		x += speed;
+		switch (dir)
+		{
+		case ENEMY_UP:
+			y -= speed;
+			break;
+		case ENEMY_UP_LEFT:
+			y -= speed;
+			x -= speed;
+			break;
+		case ENEMY_UP_RIGHT:
+			y -= speed;
+			x += speed;
+			break;
+		case ENEMY_LEFT:
+			x -= speed;
+			break;
+		case ENEMY_RIGHT:
+			x += speed;
+			break;
+		case ENEMY_DOWN:
+			y += speed;
+			break;
+		case ENEMY_DOWN_LEFT:
+			y += speed;
+			x -= speed;
+			break;
+		case ENEMY_DOWN_RIGHT:
+			y += speed;
+			x += speed;
+			break;
+		case ENEMY_LAST:
+			break;
+		}
 	}
 }
 void Enemy::OOB()
 {
 	if (y <= 0)
-		randDir();
+		randDir(touchUp);
 	if (y >= screenHeight - height)
-		randDir();
+		randDir(touchDown);
 	if (x <= 0)
-		randDir();
+		randDir(touchLeft);
 	if (x >= screenWidth - width)
-		randDir();
+		randDir(touchRight);
 }
 void Enemy::SetX(float _x)
 {

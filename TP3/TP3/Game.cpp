@@ -69,7 +69,7 @@ bool Game::InitAll()
 	}
 
 	player = new Player(SCREEN_W, SCREEN_H);
-	enemy1 = new Enemy(SCREEN_W, SCREEN_W, 32, 32);
+	enemy1 = new Enemy(SCREEN_W, SCREEN_H, 32, 32);
 
 	al_set_target_bitmap(al_get_backbuffer(display));
 
