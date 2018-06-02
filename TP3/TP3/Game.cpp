@@ -233,8 +233,39 @@ int Game::UpdateGame()
 	}
 	return 0;
 }
-int FinalMenu()
+int Game::FinalMenu()
 {
+	scoreText = al_load_ttf_font("assets/arial_narrow_7.ttf", 72, 0);
+	livesText = al_load_ttf_font("assets/arial_narrow_7.ttf", 72, 0);
+	_menu = true;
+	while (_menu)
+	{
+		ALLEGRO_EVENT ev;
+		al_wait_for_event(event_queue, &ev);
+
+		if (ev.type == ALLEGRO_EVENT_TIMER)
+		{
+			redraw = true;
+		}
+		else if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
+		{
+			_menu = false;
+			_gameOver = true;
+		}
+		else if (ev.type == ALLEGRO_EVENT_KEY_DOWN)
+		{
+			if (ev.keyboard.keycode == ALLEGRO_KEY_SPACE)
+				_menu = false;
+		}
+		if (redraw && al_is_event_queue_empty(event_queue))
+		{
+			redraw = false;
+			al_clear_to_color(al_map_rgb(0, 0, 0));
+			al_draw_text(scoreText, al_map_rgb(255, 255, 255), SCREEN_W / 3, (SCREEN_H/ 3), ALLEGRO_ALIGN_CENTRE, GetScore().c_str());			
+			al_flip_display();
+		}
+	}
+	return 0;
 }
 bool Game::bounding_box_collision(int b1_x, int b1_y, int b1_w, int b1_h, int b2_x, int b2_y, int b2_w, int b2_h)
 {

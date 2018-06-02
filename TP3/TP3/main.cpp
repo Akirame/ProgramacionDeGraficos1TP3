@@ -8,6 +8,7 @@ int main(int argc, char **argv)
 	{
 		game->MainMenu();
 		game->UpdateGame();
+		game->FinalMenu();
 	}
 	delete game;
 }
