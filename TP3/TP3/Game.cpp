@@ -24,6 +24,7 @@ Game::~Game()
 	al_destroy_display(display);
 	al_destroy_event_queue(event_queue);
 	al_destroy_font(scoreText);
+	al_destroy_font(livesText);
 }
 bool Game::InitAll()
 {
@@ -69,6 +70,18 @@ bool Game::InitAll()
 		return false;
 	}
 
+	if (!al_install_audio()) {
+		fprintf(stderr, "failed to initialize audio!\n");
+		return false;
+	}
+	if (!al_init_acodec_addon()) {
+		fprintf(stderr, "failed to initialize audio codecs!\n");
+		return false;
+	}
+	if (!al_reserve_samples(1)) {
+		fprintf(stderr, "failed to reserve samples!\n");
+		return false;
+	}
 
 	scoreText = al_load_ttf_font("assets/arial_narrow_7.ttf", 32, 0);
 	if (!scoreText)
@@ -219,6 +232,9 @@ int Game::UpdateGame()
 		
 	}
 	return 0;
+}
+int FinalMenu()
+{
 }
 bool Game::bounding_box_collision(int b1_x, int b1_y, int b1_w, int b1_h, int b2_x, int b2_y, int b2_w, int b2_h)
 {

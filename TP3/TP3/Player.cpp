@@ -12,9 +12,20 @@ Player::Player(int _screenWidth, int _screenHeight)
 	y = screenHeight / 2 - height / 2;
 	bulletDir = dir(BULLET_RIGHT);
 	bullet = new Bullet(x, y, screenWidth, screenHeight, bulletDir);
+
 	sprite = al_load_bitmap("assets/player.png");
 	if (!sprite)
 		fprintf(stderr, "failed to create player bitmap!\n");
+
+	shootSound = al_load_sample("assets/shootSound.wav");
+	if (!shootSound) {
+		fprintf(stderr,"Audio clip sample not loaded!\n");		
+	}
+
+	hurtSound = al_load_sample("assets/hurtSound.wav");
+	if (!hurtSound) {
+		fprintf(stderr, "Audio clip sample not loaded!\n");
+	}
 }
 Player::~Player()
 {	
@@ -93,7 +104,10 @@ void Player::OOB()
 void Player::Shoot(ALLEGRO_EVENT ev)
 {
 	if (ev.keyboard.keycode == ALLEGRO_KEY_K && !bullet->GetAlive())
-	{
+	{		
+		al_stop_sample(&hurtID);
+		al_stop_sample(&shootID);
+		al_play_sample(shootSound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, &shootID);
 		bullet->Reset(x, y, bulletDir);
 	}
 	if (bullet->GetAlive())
@@ -117,6 +131,9 @@ bool Player::Alive() const
 }
 void Player::OnDeath()
 {
+	al_stop_sample(&hurtID);	
+	al_stop_sample(&shootID);
+	al_play_sample(hurtSound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, &hurtID);
 	lives--;
 }
 float Player::GetX() const

@@ -1,11 +1,13 @@
 #ifndef PLAYER_H
 #define PLAYER_H
-#include "allegro5\allegro.h"
 #include <iostream>
+#include <string>
+#include "allegro5\allegro.h"
 #include <allegro5/allegro_image.h>
 #include <allegro5\allegro_native_dialog.h>
+#include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_acodec.h>
 #include "Bullet.h"
-#include <string>
 
 enum GAME_KEYS
 {
@@ -30,6 +32,10 @@ private:
 	dir bulletDir;
 	Bullet* bullet;
 	ALLEGRO_BITMAP* sprite = NULL;
+	ALLEGRO_SAMPLE* shootSound = NULL;
+	ALLEGRO_SAMPLE* hurtSound = NULL;
+	ALLEGRO_SAMPLE_ID shootID;
+	ALLEGRO_SAMPLE_ID hurtID;
 public:
 	Player(int screenWidth, int screenHeight);
 	~Player();
