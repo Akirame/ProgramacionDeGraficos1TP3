@@ -5,6 +5,7 @@
 #include <allegro5/allegro_image.h>
 #include <allegro5\allegro_native_dialog.h>
 #include "Bullet.h"
+#include <string>
 
 enum GAME_KEYS
 {
@@ -24,6 +25,7 @@ private:
 	float speed;
 	float x;
 	float y;
+	int lives;
 	int key[4] = { 0,0,0,0 };
 	dir bulletDir;
 	Bullet* bullet;
@@ -39,12 +41,15 @@ public:
 	void Shoot(ALLEGRO_EVENT ev);
 	void SetX(float _x);
 	void SetY(float _y);
+	bool Alive() const;
+	void OnDeath();
 	float GetX() const;
 	float GetY() const;
 	float GetHeight() const;
 	float GetWidht() const;
 	Bullet* GetBullet();
 	ALLEGRO_BITMAP* GetBitmap() const;
+	std::string GetLives();
 };
 #endif
 

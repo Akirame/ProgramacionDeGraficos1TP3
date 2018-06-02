@@ -11,7 +11,7 @@ Bullet::Bullet(int startX,int startY, int _screenWidth, int _screenHeight,dir _d
 	x = screenWidth / 2 - width / 2;
 	y = screenHeight / 2 - height / 2;
 	direction = _direction;
-	speed = 5;
+	speed = 7;
 	sprite = al_load_bitmap("assets/bullet.png");
 	if (!sprite)
 		fprintf(stderr, "failed to create player bitmap!\n");
@@ -29,6 +29,7 @@ void Bullet::Draw() const
 {
 	al_draw_bitmap(sprite, x, y, 0);
 }
+//dependiendo de la Dir se mueve diferente
 void Bullet::Movement()
 {	
 	if (direction == dir(BULLET_UP))
@@ -52,6 +53,7 @@ void Bullet::KillBullet()
 {
 	alive = false;
 }
+//Al chocar un costado muere la bala
 void Bullet::OOB()
 {
 	if (y <= 0)
@@ -63,6 +65,14 @@ void Bullet::OOB()
 	if (x >= screenWidth - width)
 		alive = false;
 }
+void Bullet::Reset(int startX, int startY, dir _directions)
+{
+	alive = true;
+	x = startX;
+	y = startY;
+	direction = _directions;
+}
+
 float Bullet::GetX() const
 {
 	return x;
@@ -86,11 +96,4 @@ ALLEGRO_BITMAP* Bullet::GetBitmap() const
 bool Bullet::GetAlive()
 {
 	return alive;
-}
-void Bullet::Reset(int startX, int startY, dir _directions)
-{
-	alive = true;
-	x = startX;
-	y = startY;
-	direction = _directions;
 }

@@ -1,19 +1,29 @@
 #include "Game.h"
 
-
-
 Game::Game()
 {
 	display = NULL;
 	event_queue = NULL;
 	timer = NULL;
-	font = NULL;
+	scoreText = NULL;
+	livesText = NULL;
 	_gameOver = false;
 	_menu = true;
 	redraw = true;
+	score = 0;
 }
 Game::~Game()
 {
+	if (player)
+		delete player;
+	if (enemy1)
+		delete enemy1;
+	if (enemy2)
+		delete enemy2;
+	al_destroy_timer(timer);
+	al_destroy_display(display);
+	al_destroy_event_queue(event_queue);
+	al_destroy_font(scoreText);
 }
 bool Game::InitAll()
 {
@@ -60,21 +70,27 @@ bool Game::InitAll()
 	}
 
 
-	font = al_load_ttf_font("assets/arial_narrow_7.ttf", 72, 0);
+	scoreText = al_load_ttf_font("assets/arial_narrow_7.ttf", 32, 0);
+	if (!scoreText)
+	{
+		fprintf(stderr, "Could not load 'assets/arial_narrow_7.ttf'.\n");
+		return -1;
+	}
 
-	if (!font)
+	livesText = al_load_ttf_font("assets/arial_narrow_7.ttf", 32, 0);
+	if (!livesText)
 	{
 		fprintf(stderr, "Could not load 'assets/arial_narrow_7.ttf'.\n");
 		return -1;
 	}
 
 	player = new Player(SCREEN_W, SCREEN_H);
-	enemy1 = new Enemy(SCREEN_W, SCREEN_H, 32, 32);
+	enemy1 = new Enemy(SCREEN_W, SCREEN_H,10,10);
+	enemy2 = new Enemy(SCREEN_W, SCREEN_H,SCREEN_W - 50,SCREEN_H - 50);
 
 	al_set_target_bitmap(al_get_backbuffer(display));
 
 	event_queue = al_create_event_queue();
-
 	if (!event_queue)
 	{
 		fprintf(stderr, "failed to create event_queue!\n");
@@ -84,11 +100,8 @@ bool Game::InitAll()
 		al_destroy_timer(timer);
 		return false;
 	}
-
 	al_register_event_source(event_queue, al_get_display_event_source(display));
-
 	al_register_event_source(event_queue, al_get_timer_event_source(timer));
-
 	al_register_event_source(event_queue, al_get_keyboard_event_source());
 
 	al_flip_display();
@@ -121,7 +134,7 @@ int Game::MainMenu()
 		{
 			redraw = false;
 			al_clear_to_color(al_map_rgb(0, 0, 0));
-			al_draw_text(font, al_map_rgb(255, 255, 255), 640 / 2, (480 / 3), ALLEGRO_ALIGN_CENTRE, "Press Space to start!");
+			al_draw_text(scoreText, al_map_rgb(255, 255, 255), 640 / 2, (480 / 3), ALLEGRO_ALIGN_CENTRE, "Press Space to start!");
 			al_flip_display();
 		}
 	}
@@ -136,26 +149,45 @@ int Game::UpdateGame()
 
 		if (ev.type == ALLEGRO_EVENT_TIMER)
 		{
-			if (player)
-				player->Update(ev);
-			if (enemy1)
-				enemy1->Update(ev);
+			player->Update(ev);
+			enemy1->Update(ev);
+			enemy2->Update(ev);
 			if (enemy1)
 			{
 				if (bounding_box_collision(player->GetX(), player->GetY(), player->GetWidht(), player->GetHeight(),
 					enemy1->GetX(), enemy1->GetY(), enemy1->GetWidht(), enemy1->GetHeight()))
-					_gameOver = true;
-				if (bounding_box_collision(player->GetBullet()->GetX(), player->GetBullet()->GetY(), player->GetBullet()->GetWidht(), player->GetBullet()->GetHeight()
-					, enemy1->GetX(), enemy1->GetY(), enemy1->GetWidht(), enemy1->GetHeight()))
 				{
-					if (enemy1)
-					{
-						delete enemy1;
-						enemy1 = NULL;
-					}
-					player->GetBullet()->KillBullet();
+					player->OnDeath();
+					enemy1->Reset();
 				}
+				if (player->GetBullet()->GetAlive())
+					if (bounding_box_collision(player->GetBullet()->GetX(), player->GetBullet()->GetY(), player->GetBullet()->GetWidht(), player->GetBullet()->GetHeight()
+						, enemy1->GetX(), enemy1->GetY(), enemy1->GetWidht(), enemy1->GetHeight()))
+					{
+						player->GetBullet()->KillBullet();
+						AddScore();
+						enemy1->Reset();
+					}
 			}
+			if (enemy2)
+			{
+				if (bounding_box_collision(player->GetX(), player->GetY(), player->GetWidht(), player->GetHeight(),
+					enemy2->GetX(), enemy2->GetY(), enemy2->GetWidht(), enemy2->GetHeight()))
+				{
+					player->OnDeath();
+					enemy2->Reset();
+				}
+				
+				if (player->GetBullet()->GetAlive())
+					if (bounding_box_collision(player->GetBullet()->GetX(), player->GetBullet()->GetY(), player->GetBullet()->GetWidht(), player->GetBullet()->GetHeight()
+						, enemy2->GetX(), enemy2->GetY(), enemy2->GetWidht(), enemy2->GetHeight()))
+					{
+						player->GetBullet()->KillBullet();
+						AddScore();
+						enemy2->Reset();
+					}
+			}
+			GameOver();
 			redraw = true;
 		}
 		else if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
@@ -177,21 +209,15 @@ int Game::UpdateGame()
 			redraw = false;
 
 			al_clear_to_color(al_map_rgb(0, 40, 0));
-			if (player)
-				player->Draw();
-			if (enemy1)
-				enemy1->Draw();
+			player->Draw();
+			enemy1->Draw();
+			enemy2->Draw();
+			al_draw_text(scoreText, al_map_rgb(255, 255, 255),70, 1, ALLEGRO_ALIGN_CENTRE, GetScore().c_str());
+			al_draw_text(livesText, al_map_rgb(255, 255, 255),60, 40, ALLEGRO_ALIGN_CENTRE, player->GetLives().c_str());
 			al_flip_display();
 		}
+		
 	}
-	if (player)
-		delete player;
-	if (enemy1)
-		delete enemy1;
-	al_destroy_timer(timer);
-	al_destroy_display(display);
-	al_destroy_event_queue(event_queue);
-
 	return 0;
 }
 bool Game::bounding_box_collision(int b1_x, int b1_y, int b1_w, int b1_h, int b2_x, int b2_y, int b2_w, int b2_h)
@@ -207,3 +233,21 @@ bool Game::bounding_box_collision(int b1_x, int b1_y, int b1_w, int b1_h, int b2
 	// collision
 	return true;
 }
+void Game::AddScore()
+{
+	score += 10;
+}
+std::string Game::GetScore()
+{
+	std::string scoreText = std::to_string(score);
+	return "Score: " + scoreText;
+}
+void Game::GameOver()
+{
+	if (player->Alive())
+		_gameOver = false;
+	else
+		_gameOver = true;
+}
+
+

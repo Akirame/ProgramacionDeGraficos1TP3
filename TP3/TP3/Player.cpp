@@ -4,7 +4,8 @@ Player::Player(int _screenWidth, int _screenHeight)
 {
 	width = 32;
 	height = 32;
-	speed = 2;
+	speed = 4;
+	lives = 3;
 	screenWidth = _screenWidth;
 	screenHeight = _screenHeight;
 	x = screenWidth / 2 - width / 2;
@@ -107,6 +108,17 @@ void Player::SetY(float _y)
 {
 	y += _y;
 }
+bool Player::Alive() const
+{
+	if (lives <= 0)
+		return false;
+	else
+		return true;
+}
+void Player::OnDeath()
+{
+	lives--;
+}
 float Player::GetX() const
 {
 	return x;
@@ -130,4 +142,9 @@ Bullet* Player::GetBullet()
 ALLEGRO_BITMAP* Player::GetBitmap() const
 {
 	return sprite;
+}
+std::string Player::GetLives()
+{
+	std::string livesText = std::to_string(lives);
+	return "Lives: " + livesText;
 }

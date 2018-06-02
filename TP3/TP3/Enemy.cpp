@@ -1,6 +1,6 @@
 #include "Enemy.h"
 
-Enemy::Enemy(int _screenWidth, int _screenHeight, int startX, int startY)
+Enemy::Enemy(int _screenWidth, int _screenHeight,int startX,int startY)
 {
 	srand(time(0));
 	width = 32;
@@ -10,30 +10,36 @@ Enemy::Enemy(int _screenWidth, int _screenHeight, int startX, int startY)
 	screenHeight = _screenHeight;
 	x = startX;
 	y = startY;
+	RandomDir();
 	sprite = al_load_bitmap("assets/enemy.png");
 	if (!sprite)
 		fprintf(stderr, "failed to create enemy bitmap!\n");	
 }
 
-void Enemy::randDir(directions _dir[])
-{	
-	int randIndex = rand() % 5;
-	dir = _dir[randIndex];
-}
 Enemy::~Enemy()
 {	
 	al_destroy_bitmap(sprite);
 }
+
+//Random a direccion cuando toca un lateral
+void Enemy::RandomDirOnTouch(directions _dir[])
+{	
+	int randIndex = rand() % 3;
+	dir = _dir[randIndex];
+}
+
 void Enemy::Update(ALLEGRO_EVENT ev)
 {	
 	Movement(ev);
 	OOB();
 }
+
 void Enemy::Draw() const
 {	
 	al_draw_bitmap(sprite, x, y, 0);
 }
 
+//dependiendo de la Dir se mueve diferente
 void Enemy::Movement(ALLEGRO_EVENT ev)
 {
 	if (ev.type == ALLEGRO_EVENT_TIMER) {
@@ -72,17 +78,40 @@ void Enemy::Movement(ALLEGRO_EVENT ev)
 		}
 	}
 }
+
+//Al chocar contra un costado cambia su direccion dependiendo de que lado choco
 void Enemy::OOB()
 {
 	if (y <= 0)
-		randDir(touchUp);
+		RandomDirOnTouch(touchUp);
 	if (y >= screenHeight - height)
-		randDir(touchDown);
+		RandomDirOnTouch(touchDown);
 	if (x <= 0)
-		randDir(touchLeft);
+		RandomDirOnTouch(touchLeft);
 	if (x >= screenWidth - width)
-		randDir(touchRight);
+		RandomDirOnTouch(touchRight);
 }
+
+//Reset a cualquier punto en la pantalla y dirección
+void Enemy::Reset()
+{	
+	RandomPoint();
+	RandomDir();
+}
+
+//Punto random en la pantalla
+void Enemy::RandomPoint()
+{
+	x = rand() % screenWidth;
+	y = rand() % screenHeight;
+}
+
+//random a direccion en cualquier direccion
+void Enemy::RandomDir() 
+{
+	dir = static_cast<directions>(rand() % ENEMY_LAST);
+}
+
 void Enemy::SetX(float _x)
 {
 	x += _x;
