@@ -30,7 +30,8 @@ Player::Player(int _screenWidth, int _screenHeight)
 Player::~Player()
 {	
 	al_destroy_bitmap(sprite);
-	if(bullet)
+	al_destroy_sample(shootSound);
+	al_destroy_sample(hurtSound);	
 	delete bullet;
 }
 void Player::Update(ALLEGRO_EVENT ev)

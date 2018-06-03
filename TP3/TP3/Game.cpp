@@ -2,6 +2,7 @@
 
 Game::Game()
 {
+	srand(time(0));
 	display = NULL;
 	event_queue = NULL;
 	timer = NULL;
@@ -17,9 +18,8 @@ Game::Game()
 	enemiesStronger = false;
 }
 Game::~Game()
-{
-	if (player)
-		delete player;
+{	
+	delete player;			
 	enemies->clear();
 	delete enemies;
 	al_destroy_timer(timer);
@@ -30,6 +30,7 @@ Game::~Game()
 }
 bool Game::InitAll()
 {
+	
 	if (!al_init()) {
 		fprintf(stderr, "failed to initialize allegro!\n");
 		return false;
@@ -103,8 +104,8 @@ bool Game::InitAll()
 
 	//Instanciacion enemigos
 	for (int i = 0; i < cantEnemies; i++)
-	{
-		Enemy* enemy = new Enemy(SCREEN_W, SCREEN_H, rand() % SCREEN_W, rand() % SCREEN_H); 
+	{		
+		Enemy* enemy = new Enemy(SCREEN_W, SCREEN_H); 
 		enemies->push_front(*enemy);
 	}
 	iterEnemyBegin = enemies->begin();
@@ -251,7 +252,7 @@ int Game::FinalMenu()
 		else if (ev.type == ALLEGRO_EVENT_KEY_DOWN)
 		{
 			if (ev.keyboard.keycode == ALLEGRO_KEY_SPACE)
-				_menu = false;
+				_finalMenu = false;
 		}
 		if (redraw && al_is_event_queue_empty(event_queue))
 		{
@@ -261,6 +262,7 @@ int Game::FinalMenu()
 			al_flip_display();
 		}
 	}
+
 	return 0;
 }
 bool Game::bounding_box_collision(int b1_x, int b1_y, int b1_w, int b1_h, int b2_x, int b2_y, int b2_w, int b2_h)
@@ -296,7 +298,7 @@ void Game::Difficulty()
 {
 	if (score >= 200 && !enemiesStronger)
 	{
-		Enemy* enemy = new Enemy(SCREEN_W, SCREEN_H, rand() % SCREEN_W, rand() % SCREEN_H);
+		Enemy* enemy = new Enemy(SCREEN_W, SCREEN_H);
 		enemies->push_front(*enemy);
 		iterEnemyBegin = enemies->begin();
 		iterEnemyEnd = enemies->end();

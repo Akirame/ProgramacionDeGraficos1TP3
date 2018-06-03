@@ -35,7 +35,7 @@ private:
 	ALLEGRO_BITMAP* sprite = NULL;
 	void RandomDirOnTouch(directions dir[]);
 public:
-	Enemy(int screenWidth, int screenHeight,int startX,int startY);
+	Enemy(int screenWidth, int screenHeight);
 	~Enemy();
 	void SetX(float _x);
 	void SetY(float _y);
@@ -52,7 +52,7 @@ public:
 	void Reset();
 	void RandomPoint();
 	void RandomDir();
-	void speedPlusPlus();
+	void speedPlusPlus();	
 };
 #endif
 

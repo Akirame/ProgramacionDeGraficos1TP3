@@ -1,5 +1,8 @@
 #include <stdio.h>
 #include "Game.h"
+#ifdef DEBUG
+#include "vld.h"
+#endif
 
 int main(int argc, char **argv)
 {

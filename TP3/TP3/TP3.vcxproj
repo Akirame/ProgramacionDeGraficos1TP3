@@ -102,15 +102,18 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)lib\Allegro\allegro_5.1.12_x86\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)lib\Allegro\allegro_5.1.12_x86\include;$(SolutionDir)lib\Visual Leak Detector\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>DEBUG;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib\Allegro\allegro_5.1.12_x86\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>allegro-debug.lib;allegro_dialog-debug.lib;allegro_image-debug.lib;allegro_audio-debug.lib;allegro_acodec-debug.lib;allegro_font-debug.lib;allegro_ttf-debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib\Allegro\allegro_5.1.12_x86\lib;$(SolutionDir)lib\Visual Leak Detector\lib\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>allegro-debug.lib;allegro_dialog-debug.lib;allegro_image-debug.lib;allegro_audio-debug.lib;allegro_acodec-debug.lib;allegro_font-debug.lib;allegro_ttf-debug.lib;vld.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(SolutionDir)lib\Allegro\allegro_5.1.12_x86\bin\DebugDLL" "$(OutDir)" /y /s
-xcopy "$(SolutionDir)assets" "$(OutDir)"  /y /s</Command>
+xcopy "$(SolutionDir)assets" "$(OutDir)\assets"  /y /s /i
+xcopy "$(SolutionDir)lib\Visual Leak Detector\bin\Win32" "$(OutDir)" /y /s</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -125,7 +128,7 @@ xcopy "$(SolutionDir)assets" "$(OutDir)"  /y /s</Command>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(SolutionDir)lib\Allegro\allegro_5.1.12_x86\bin\DebugDLL" "$(OutDir)" /y /s
-xcopy "$(SolutionDir)assets" "$(OutDir)"  /y /s</Command>
+xcopy "$(SolutionDir)assets" "$(OutDir)\assets"  /y /s /i</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -142,10 +145,11 @@ xcopy "$(SolutionDir)assets" "$(OutDir)"  /y /s</Command>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>allegro.lib;allegro_dialog.lib;allegro_image.lib;allegro_audio.lib;allegro_acodec.lib;allegro_font.lib;allegro_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)lib\Allegro\allegro_5.1.12_x86\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <SubSystem>Windows</SubSystem>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(SolutionDir)lib\Allegro\allegro_5.1.12_x86\bin\ReleaseDLL" "$(OutDir)" /y /s
-xcopy "$(SolutionDir)assets" "$(OutDir)"  /y /s</Command>
+xcopy "$(SolutionDir)assets" "$(OutDir)\assets"  /y /s /i</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

@@ -1,15 +1,14 @@
 #include "Enemy.h"
 
-Enemy::Enemy(int _screenWidth, int _screenHeight,int startX,int startY)
+Enemy::Enemy(int _screenWidth, int _screenHeight)
 {
-	srand(time(0));
+	
 	width = 32;
 	height = 32;
 	speed = 3;
 	screenWidth = _screenWidth;
 	screenHeight = _screenHeight;
-	x = startX;
-	y = startY;
+	RandomPoint();
 	RandomDir();
 	sprite = al_load_bitmap("assets/enemy.png");
 	if (!sprite)
@@ -17,7 +16,7 @@ Enemy::Enemy(int _screenWidth, int _screenHeight,int startX,int startY)
 }
 
 Enemy::~Enemy()
-{	
+{		
 	al_destroy_bitmap(sprite);
 }
 
