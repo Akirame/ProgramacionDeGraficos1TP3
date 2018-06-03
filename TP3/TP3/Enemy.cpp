@@ -102,14 +102,37 @@ void Enemy::Reset()
 //Punto random en la pantalla
 void Enemy::RandomPoint()
 {
-	x = rand() % screenWidth;
-	y = rand() % screenHeight;
+	int randIndex = rand() % 4;
+	switch (startPos[randIndex])
+	{
+	case ENEMY_UP:
+		x = rand() % screenWidth;
+		y = 5;
+		break;
+	case ENEMY_DOWN:
+		x = rand() % screenWidth;
+		y = screenHeight - height - 5;
+		break;
+	case ENEMY_LEFT:
+		x = 5;
+		y = rand() % screenHeight;
+		break;
+	case ENEMY_RIGHT:
+		x = screenWidth - width - 5;
+		y = rand() % screenHeight;
+		break;
+	}
 }
 
-//random a direccion en cualquier direccion
-void Enemy::RandomDir() 
+//Direccion random
+void Enemy::RandomDir()
 {
 	dir = static_cast<directions>(rand() % ENEMY_LAST);
+}
+
+void Enemy::speedPlusPlus()
+{
+	speed += 2;
 }
 
 void Enemy::SetX(float _x)

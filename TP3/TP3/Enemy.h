@@ -27,6 +27,7 @@ private:
 	directions touchDown[3] = {ENEMY_UP,ENEMY_UP_LEFT,ENEMY_UP_RIGHT};
 	directions touchLeft[3] = {ENEMY_UP_RIGHT,ENEMY_RIGHT,ENEMY_DOWN_RIGHT };
 	directions touchRight[3] = {ENEMY_UP_LEFT,ENEMY_LEFT,ENEMY_DOWN_LEFT };
+	directions startPos[4] = { ENEMY_UP,ENEMY_DOWN,ENEMY_LEFT,ENEMY_RIGHT };
 	float x;
 	float y;
 	float speed;
@@ -51,6 +52,7 @@ public:
 	void Reset();
 	void RandomPoint();
 	void RandomDir();
+	void speedPlusPlus();
 };
 #endif
 

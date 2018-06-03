@@ -7,19 +7,21 @@ Game::Game()
 	timer = NULL;
 	scoreText = NULL;
 	livesText = NULL;
+	enemies = new list<Enemy>();
 	_gameOver = false;
 	_menu = true;
+	_finalMenu = true;
 	redraw = true;
 	score = 0;
+	cantEnemies = 4;
+	enemiesStronger = false;
 }
 Game::~Game()
 {
 	if (player)
 		delete player;
-	if (enemy1)
-		delete enemy1;
-	if (enemy2)
-		delete enemy2;
+	enemies->clear();
+	delete enemies;
 	al_destroy_timer(timer);
 	al_destroy_display(display);
 	al_destroy_event_queue(event_queue);
@@ -98,8 +100,15 @@ bool Game::InitAll()
 	}
 
 	player = new Player(SCREEN_W, SCREEN_H);
-	enemy1 = new Enemy(SCREEN_W, SCREEN_H,10,10);
-	enemy2 = new Enemy(SCREEN_W, SCREEN_H,SCREEN_W - 50,SCREEN_H - 50);
+
+	//Instanciacion enemigos
+	for (int i = 0; i < cantEnemies; i++)
+	{
+		Enemy* enemy = new Enemy(SCREEN_W, SCREEN_H, rand() % SCREEN_W, rand() % SCREEN_H); 
+		enemies->push_front(*enemy);
+	}
+	iterEnemyBegin = enemies->begin();
+	iterEnemyEnd = enemies->end();
 
 	al_set_target_bitmap(al_get_backbuffer(display));
 
@@ -108,7 +117,7 @@ bool Game::InitAll()
 	{
 		fprintf(stderr, "failed to create event_queue!\n");
 		delete player;
-		delete enemy1;
+		enemies->clear();
 		al_destroy_display(display);
 		al_destroy_timer(timer);
 		return false;
@@ -137,6 +146,7 @@ int Game::MainMenu()
 		{
 			_menu = false;
 			_gameOver = true;
+			_finalMenu = false;
 		}
 		else if (ev.type == ALLEGRO_EVENT_KEY_DOWN)
 		{
@@ -154,7 +164,7 @@ int Game::MainMenu()
 	return 0;
 }
 int Game::UpdateGame()
-{
+{	
 	while (!_gameOver)
 	{
 		ALLEGRO_EVENT ev;
@@ -163,49 +173,35 @@ int Game::UpdateGame()
 		if (ev.type == ALLEGRO_EVENT_TIMER)
 		{
 			player->Update(ev);
-			enemy1->Update(ev);
-			enemy2->Update(ev);
-			if (enemy1)
+
+			//Update y colision enemigos
+			for (list<Enemy>::iterator iter = iterEnemyBegin; iter != iterEnemyEnd; iter++)
 			{
-				if (bounding_box_collision(player->GetX(), player->GetY(), player->GetWidht(), player->GetHeight(),
-					enemy1->GetX(), enemy1->GetY(), enemy1->GetWidht(), enemy1->GetHeight()))
-				{
-					player->OnDeath();
-					enemy1->Reset();
-				}
-				if (player->GetBullet()->GetAlive())
-					if (bounding_box_collision(player->GetBullet()->GetX(), player->GetBullet()->GetY(), player->GetBullet()->GetWidht(), player->GetBullet()->GetHeight()
-						, enemy1->GetX(), enemy1->GetY(), enemy1->GetWidht(), enemy1->GetHeight()))
+				iter->Update(ev);
+					if (bounding_box_collision(player->GetX(), player->GetY(), player->GetWidht(), player->GetHeight(),
+						iter->GetX(), iter->GetY(), iter->GetWidht(), iter->GetHeight()))
 					{
-						player->GetBullet()->KillBullet();
-						AddScore();
-						enemy1->Reset();
+						player->OnDeath();
+						iter->Reset();
 					}
-			}
-			if (enemy2)
-			{
-				if (bounding_box_collision(player->GetX(), player->GetY(), player->GetWidht(), player->GetHeight(),
-					enemy2->GetX(), enemy2->GetY(), enemy2->GetWidht(), enemy2->GetHeight()))
-				{
-					player->OnDeath();
-					enemy2->Reset();
+					if (player->GetBullet()->GetAlive())
+						if (bounding_box_collision(player->GetBullet()->GetX(), player->GetBullet()->GetY(), player->GetBullet()->GetWidht(), player->GetBullet()->GetHeight()
+							, iter->GetX(), iter->GetY(), iter->GetWidht(), iter->GetHeight()))
+						{
+							player->GetBullet()->KillBullet();
+							AddScore();
+							iter->Reset();
+						}
 				}
-				
-				if (player->GetBullet()->GetAlive())
-					if (bounding_box_collision(player->GetBullet()->GetX(), player->GetBullet()->GetY(), player->GetBullet()->GetWidht(), player->GetBullet()->GetHeight()
-						, enemy2->GetX(), enemy2->GetY(), enemy2->GetWidht(), enemy2->GetHeight()))
-					{
-						player->GetBullet()->KillBullet();
-						AddScore();
-						enemy2->Reset();
-					}
-			}
+
 			GameOver();
+			Difficulty();
 			redraw = true;
 		}
 		else if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
 		{
 			_gameOver = true;
+			_finalMenu = false;
 		}
 		else if (ev.type == ALLEGRO_EVENT_KEY_DOWN)
 		{
@@ -223,8 +219,10 @@ int Game::UpdateGame()
 
 			al_clear_to_color(al_map_rgb(0, 40, 0));
 			player->Draw();
-			enemy1->Draw();
-			enemy2->Draw();
+			for (list<Enemy>::iterator iter = iterEnemyBegin; iter != iterEnemyEnd; iter++)
+			{
+				iter->Draw();
+			}
 			al_draw_text(scoreText, al_map_rgb(255, 255, 255),70, 1, ALLEGRO_ALIGN_CENTRE, GetScore().c_str());
 			al_draw_text(livesText, al_map_rgb(255, 255, 255),60, 40, ALLEGRO_ALIGN_CENTRE, player->GetLives().c_str());
 			al_flip_display();
@@ -236,9 +234,8 @@ int Game::UpdateGame()
 int Game::FinalMenu()
 {
 	scoreText = al_load_ttf_font("assets/arial_narrow_7.ttf", 72, 0);
-	livesText = al_load_ttf_font("assets/arial_narrow_7.ttf", 72, 0);
-	_menu = true;
-	while (_menu)
+	livesText = al_load_ttf_font("assets/arial_narrow_7.ttf", 72, 0);	
+	while (_finalMenu)
 	{
 		ALLEGRO_EVENT ev;
 		al_wait_for_event(event_queue, &ev);
@@ -249,8 +246,7 @@ int Game::FinalMenu()
 		}
 		else if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
 		{
-			_menu = false;
-			_gameOver = true;
+			_finalMenu = false;			
 		}
 		else if (ev.type == ALLEGRO_EVENT_KEY_DOWN)
 		{
@@ -295,6 +291,21 @@ void Game::GameOver()
 		_gameOver = false;
 	else
 		_gameOver = true;
+}
+void Game::Difficulty() 
+{
+	if (score >= 200 && !enemiesStronger)
+	{
+		Enemy* enemy = new Enemy(SCREEN_W, SCREEN_H, rand() % SCREEN_W, rand() % SCREEN_H);
+		enemies->push_front(*enemy);
+		iterEnemyBegin = enemies->begin();
+		iterEnemyEnd = enemies->end();
+		for (list<Enemy>::iterator iter = iterEnemyBegin; iter != iterEnemyEnd; iter++)
+		{
+			iter->speedPlusPlus();
+		}
+		enemiesStronger = true;
+	}
 }
 
 

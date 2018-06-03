@@ -2,6 +2,7 @@
 #define GAME_H
 #include <iostream>
 #include <string>
+#include <list>
 #include <allegro5/allegro.h>
 #include "allegro5/allegro_image.h"
 #include "allegro5/allegro_native_dialog.h"
@@ -11,7 +12,7 @@
 #include <allegro5/allegro_acodec.h>
 #include "Player.h"
 #include "Enemy.h"
-
+using namespace std;
 
 class Game
 {
@@ -25,12 +26,16 @@ private:
 	ALLEGRO_FONT* scoreText;
 	ALLEGRO_FONT* livesText;	
 	Player* player;
-	Enemy* enemy1;
-	Enemy* enemy2;
+	list<Enemy>* enemies;
+	list<Enemy>::iterator iterEnemyBegin;
+	list<Enemy>::iterator iterEnemyEnd;
 	bool _gameOver;
 	bool _menu;
+	bool _finalMenu;
 	bool redraw;
+	bool enemiesStronger;
 	int score;
+	int cantEnemies;
 public:
 	Game();
 	~Game();
@@ -42,6 +47,7 @@ public:
 	void AddScore();	
 	std::string GetScore();
 	void GameOver();
+	void Difficulty();
 };
 #endif
 
