@@ -12,9 +12,10 @@ void PowerUp::ActivePower(Player &p)
 {
 	switch (typePower)
 	{
-	case BIG:
+	case BIGBULLET:
 		break;
 	case SPEED:
+		p.MoreSpeed();
 		break;
 	case INVUL:
 		p.SetInvulnerable(true);

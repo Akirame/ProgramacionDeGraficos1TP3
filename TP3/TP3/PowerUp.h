@@ -9,7 +9,7 @@
 
 enum typeOfPower 
 {
-	BIG,
+	BIGBULLET,
 	SPEED,
 	INVUL,
 	LIVES,

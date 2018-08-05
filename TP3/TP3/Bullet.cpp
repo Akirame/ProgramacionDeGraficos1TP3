@@ -93,7 +93,12 @@ ALLEGRO_BITMAP* Bullet::GetBitmap() const
 {
 	return sprite;
 }
-bool Bullet::GetAlive()
+bool Bullet::GetAlive() const
 {
 	return alive;
+}
+void Bullet::BiggerBullet()
+{
+	height += 10;
+	width += 10;
 }

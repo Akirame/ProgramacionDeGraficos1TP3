@@ -17,7 +17,7 @@ private:
 	int width;
 	int height;
 	int screenWidth;
-	int screenHeight;
+	int screenHeight;	
 	float x;
 	float y;
 	float speed;
@@ -33,7 +33,8 @@ public:
 	float GetY() const;	
 	float GetHeight() const;
 	float GetWidht() const;
-	bool GetAlive();
+	bool GetAlive() const;
+	void BiggerBullet();
 	ALLEGRO_BITMAP* GetBitmap() const;
 	void Movement();
 	void Update();

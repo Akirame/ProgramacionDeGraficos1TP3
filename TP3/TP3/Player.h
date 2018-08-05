@@ -29,6 +29,8 @@ private:
 	float y;
 	float contaTimer;
 	float contaInvul;
+	int contaSpeedUpgrades;
+	int contaBiggerUpgrades;
 	int lives;
 	int key[4] = { 0,0,0,0 };
 	bool invulnerable;
@@ -63,6 +65,8 @@ public:
 	void AddLives(int toAdd);
 	bool CanDie() const;
 	void SetInvulnerable(bool toSet);
+	void MoreSpeed();
+	void BiggerBullet();
 };
 #endif
 

@@ -10,7 +10,8 @@ Player::Player(int _screenWidth, int _screenHeight) : screenWidth(_screenWidth),
 	invulnerable = false;
 	contaTimer = 0;
 	contaInvul = 5;
-
+	contaSpeedUpgrades = 0;
+	contaBiggerUpgrades = 0;
 	x = screenWidth / 2 - width / 2;
 	y = screenHeight / 2 - height / 2;
 	bulletDir = dir(BULLET_RIGHT);
@@ -201,4 +202,20 @@ bool Player::CanDie() const
 void Player::SetInvulnerable(bool toSet)
 {
 	invulnerable = toSet;
+}
+void Player::MoreSpeed()
+{
+	if (contaSpeedUpgrades < 4)
+	{
+		speed++;
+		contaSpeedUpgrades++;
+	}
+}
+void Player::BiggerBullet()
+{
+	if (contaBiggerUpgrades < 3)
+	{
+		bullet->BiggerBullet();
+		contaBiggerUpgrades++;
+	}
 }
