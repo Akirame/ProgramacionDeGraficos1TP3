@@ -27,8 +27,11 @@ private:
 	float speed;
 	float x;
 	float y;
+	float contaTimer;
+	float contaInvul;
 	int lives;
 	int key[4] = { 0,0,0,0 };
+	bool invulnerable;
 	dir bulletDir;
 	Bullet* bullet;
 	ALLEGRO_BITMAP* sprite = NULL;
@@ -36,6 +39,7 @@ private:
 	ALLEGRO_SAMPLE* hurtSound = NULL;
 	ALLEGRO_SAMPLE_ID shootID;
 	ALLEGRO_SAMPLE_ID hurtID;
+	ALLEGRO_TIMER* timerInvul;
 public:
 	Player(int screenWidth, int screenHeight);
 	~Player();
@@ -55,7 +59,10 @@ public:
 	float GetWidht() const;
 	Bullet* GetBullet();
 	ALLEGRO_BITMAP* GetBitmap() const;
-	std::string GetLives();
+	std::string GetLives() const;
+	void AddLives(int toAdd);
+	bool CanDie() const;
+	void SetInvulnerable(bool toSet);
 };
 #endif
 

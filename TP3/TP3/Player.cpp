@@ -1,13 +1,16 @@
 #include "Player.h"
 
-Player::Player(int _screenWidth, int _screenHeight)
+Player::Player(int _screenWidth, int _screenHeight) : screenWidth(_screenWidth),screenHeight(_screenHeight)
 {
 	width = 32;
 	height = 32;
 	speed = 4;
 	lives = 3;
-	screenWidth = _screenWidth;
-	screenHeight = _screenHeight;
+
+	invulnerable = false;
+	contaTimer = 0;
+	contaInvul = 5;
+
 	x = screenWidth / 2 - width / 2;
 	y = screenHeight / 2 - height / 2;
 	bulletDir = dir(BULLET_RIGHT);
@@ -26,12 +29,18 @@ Player::Player(int _screenWidth, int _screenHeight)
 	if (!hurtSound) {
 		fprintf(stderr, "Audio clip sample not loaded!\n");
 	}
+	timerInvul = al_create_timer(1.0 / 60);
+
+	if (!timerInvul) {
+		fprintf(stderr, "failed to create timerInvul!\n");
+	}
 }
 Player::~Player()
 {	
 	al_destroy_bitmap(sprite);
 	al_destroy_sample(shootSound);
 	al_destroy_sample(hurtSound);	
+	al_destroy_timer(timerInvul);
 	delete bullet;
 }
 void Player::Update(ALLEGRO_EVENT ev)
@@ -42,6 +51,18 @@ void Player::Update(ALLEGRO_EVENT ev)
 }
 void Player::Movement(ALLEGRO_EVENT ev)
 {
+	if (ev.type == ALLEGRO_EVENT_TIMER && invulnerable)
+	{
+		if (contaTimer < contaInvul)
+		{
+			contaTimer += 0.1 / 60; //1 fps
+		}
+		else
+		{
+			invulnerable = false;
+			contaTimer = 0;
+		}
+	}
 	if (ev.type == ALLEGRO_EVENT_KEY_DOWN)
 	{
 		if (ev.keyboard.keycode == ALLEGRO_KEY_A)
@@ -161,8 +182,23 @@ ALLEGRO_BITMAP* Player::GetBitmap() const
 {
 	return sprite;
 }
-std::string Player::GetLives()
+std::string Player::GetLives() const
 {
 	std::string livesText = std::to_string(lives);
 	return "Lives: " + livesText;
+}
+void Player::AddLives(int toAdd)
+{
+	lives += toAdd;
+}
+bool Player::CanDie() const
+{
+	if (invulnerable)
+		return false;
+	else
+		return true;
+}
+void Player::SetInvulnerable(bool toSet)
+{
+	invulnerable = toSet;
 }

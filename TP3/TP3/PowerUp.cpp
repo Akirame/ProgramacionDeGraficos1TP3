@@ -17,8 +17,10 @@ void PowerUp::ActivePower(Player &p)
 	case SPEED:
 		break;
 	case INVUL:
+		p.SetInvulnerable(true);
 		break;
 	case LIVES:
+		p.AddLives(1);
 		break;	
 	}
 }
