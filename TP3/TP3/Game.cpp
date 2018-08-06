@@ -101,6 +101,7 @@ bool Game::InitAll()
 	}
 
 	player = new Player(SCREEN_W, SCREEN_H);
+	pUp = new PowerUp(SCREEN_W, SCREEN_H);
 
 	//Instanciacion enemigos
 	for (int i = 0; i < cantEnemies; i++)
@@ -194,7 +195,14 @@ int Game::UpdateGame()
 							iter->Reset();
 						}
 				}
+			if (contaUpgrades < RESPAWN_UPGRADE)
+			{
+				contaUpgrades += 1 / FPS;
+			}
+			else
+			{
 
+			}
 			GameOver();
 			Difficulty();
 			redraw = true;

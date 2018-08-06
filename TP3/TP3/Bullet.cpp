@@ -102,3 +102,8 @@ void Bullet::BiggerBullet()
 	height += 10;
 	width += 10;
 }
+void Bullet::SetSize(int _width, int _height)
+{
+	width = _width;
+	height = _height;
+}

@@ -1,13 +1,11 @@
 #include "Enemy.h"
 
-Enemy::Enemy(int _screenWidth, int _screenHeight)
+Enemy::Enemy(int _screenWidth, int _screenHeight) : screenWidth(_screenWidth), screenHeight(_screenHeight)
 {
 	
 	width = 32;
 	height = 32;
 	speed = 3;
-	screenWidth = _screenWidth;
-	screenHeight = _screenHeight;
 	RandomPoint();
 	RandomDir();
 	sprite = al_load_bitmap("assets/enemy.png");

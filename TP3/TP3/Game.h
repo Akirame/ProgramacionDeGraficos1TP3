@@ -12,6 +12,8 @@
 #include <allegro5/allegro_acodec.h>
 #include "Player.h"
 #include "Enemy.h"
+#include "PowerUp.h"
+#define RESPAWN_UPGRADE 20
 using namespace std;
 
 class Game
@@ -26,6 +28,7 @@ private:
 	ALLEGRO_FONT* scoreText;
 	ALLEGRO_FONT* livesText;	
 	Player* player;
+	PowerUp* pUp;
 	list<Enemy>* enemies;
 	list<Enemy>::iterator iterEnemyBegin;
 	list<Enemy>::iterator iterEnemyEnd;
@@ -36,6 +39,7 @@ private:
 	bool enemiesStronger;
 	int score;
 	int cantEnemies;
+	int contaUpgrades;
 public:
 	Game();
 	~Game();

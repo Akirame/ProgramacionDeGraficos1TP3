@@ -1,8 +1,8 @@
 #include "PowerUp.h"
 
 PowerUp::PowerUp(int _screenWidth, int _screenHeight) : screenWidth(_screenWidth), screenHeight(_screenHeight)
-{
-	typePower = typeOfPower(rand() & LAST);
+{	
+	alive = false;
 }
 PowerUp::~PowerUp()
 {
@@ -13,6 +13,7 @@ void PowerUp::ActivePower(Player &p)
 	switch (typePower)
 	{
 	case BIGBULLET:
+		p.BiggerBullet();
 		break;
 	case SPEED:
 		p.MoreSpeed();
@@ -24,6 +25,7 @@ void PowerUp::ActivePower(Player &p)
 		p.AddLives(1);
 		break;	
 	}
+	alive = false;
 }
 void PowerUp::SetX(float _x)
 {
@@ -56,4 +58,23 @@ ALLEGRO_BITMAP* PowerUp::GetBitmap()
 typeOfPower PowerUp::GetType() const
 {
 	return typePower;
+}
+void PowerUp::Draw() const
+{	
+	al_draw_bitmap(sprite, x, y, 0);
+}
+void PowerUp::Spawn()
+{
+	x = rand() % screenWidth;
+	y = rand() % screenHeight;
+	typePower = typeOfPower(rand() & LAST);
+	alive = true;
+}
+
+bool PowerUp::Alive()
+{
+	if (alive)
+		return true;
+	else
+		return false;
 }

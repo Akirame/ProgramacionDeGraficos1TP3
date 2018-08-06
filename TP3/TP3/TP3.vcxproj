@@ -24,12 +24,14 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="PowerUp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bullet.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="PowerUp.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{0C5AE3DD-F0C1-4B1F-9A03-1F222BC99A6F}</ProjectGuid>
