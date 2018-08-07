@@ -100,7 +100,7 @@ bool Game::InitAll()
 	}
 
 	player = new Player(SCREEN_W, SCREEN_H, false);
-	secondPlayer = new Player(SCREEN_H, SCREEN_H, true);
+	secondPlayer = new Player(SCREEN_W, SCREEN_H, true);
 	pUp = new PowerUp(SCREEN_W, SCREEN_H);
 
 	//Instanciacion enemigos
@@ -286,8 +286,8 @@ int Game::UpdateGame()
 					if (bounding_box_collision(player->GetBullet()->GetX(), player->GetBullet()->GetY(), player->GetBullet()->GetWidht(), player->GetBullet()->GetHeight()
 						, secondPlayer->GetX(), secondPlayer->GetY(), secondPlayer->GetWidht(), secondPlayer->GetHeight()))
 					{
-						player->GetBullet()->KillBullet();
-						AddScore();
+						player->GetBullet()->KillBullet();		
+						if(secondPlayer->CanDie())
 						secondPlayer->OnDeath();
 					}
 				}
@@ -297,8 +297,8 @@ int Game::UpdateGame()
 					if (bounding_box_collision(secondPlayer->GetBullet()->GetX(), secondPlayer->GetBullet()->GetY(), secondPlayer->GetBullet()->GetWidht(), secondPlayer->GetBullet()->GetHeight()
 						, player->GetX(), player->GetY(), player->GetWidht(), player->GetHeight()))
 					{
-						secondPlayer->GetBullet()->KillBullet();
-						AddScore();
+						secondPlayer->GetBullet()->KillBullet();						
+						if(player->CanDie())
 						player->OnDeath();
 					}
 				}
@@ -323,7 +323,7 @@ int Game::UpdateGame()
 					else if (bounding_box_collision(secondPlayer->GetX(), secondPlayer->GetY(), secondPlayer->GetWidht(), secondPlayer->GetHeight(),
 						pUp->GetX(), pUp->GetY(), pUp->GetWidht(), pUp->GetHeight()))
 					{
-						pUp->ActivePower(player);
+						pUp->ActivePower(secondPlayer);
 						contaUpgrades = 0;
 					}
 				}
@@ -368,13 +368,9 @@ int Game::UpdateGame()
 
 				al_clear_to_color(al_map_rgb(0, 40, 0));
 				player->Draw();
-				pUp->Draw();
-				for (list<Enemy>::iterator iter = iterEnemyBegin; iter != iterEnemyEnd; iter++)
-				{
-					iter->Draw();
-				}
-				al_draw_text(scoreText, al_map_rgb(255, 255, 255), 70, 1, ALLEGRO_ALIGN_CENTRE, GetScore().c_str());
-				al_draw_text(livesText, al_map_rgb(255, 255, 255), 60, 40, ALLEGRO_ALIGN_CENTRE, player->GetLives().c_str());
+				secondPlayer->Draw();
+				pUp->Draw();											
+				al_draw_text(livesText, al_map_rgb(255, 255, 255), SCREEN_W / 2, 10, ALLEGRO_ALIGN_CENTRE, ((string)"1P "+(string)player->GetLives().c_str() + (string)" - 2P " + (string)secondPlayer->GetLives().c_str()).c_str());
 				al_flip_display();
 			}
 
