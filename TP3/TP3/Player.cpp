@@ -1,4 +1,4 @@
-	#include "Player.h"
+#include "Player.h"
 
 Player::Player(int _screenWidth, int _screenHeight) :
 	screenWidth(_screenWidth), screenHeight(_screenHeight),
@@ -19,7 +19,7 @@ Player::Player(int _screenWidth, int _screenHeight) :
 
 	shootSound = al_load_sample("assets/shootSound.wav");
 	if (!shootSound) {
-		fprintf(stderr,"Audio clip sample not loaded!\n");		
+		fprintf(stderr, "Audio clip sample not loaded!\n");
 	}
 
 	hurtSound = al_load_sample("assets/hurtSound.wav");
@@ -31,20 +31,24 @@ Player::Player(int _screenWidth, int _screenHeight) :
 	if (!timerInvul) {
 		fprintf(stderr, "failed to create timerInvul!\n");
 	}
+	spriteInvul = al_load_bitmap("assets/playerInvul.png");
+	if (!spriteInvul)
+		fprintf(stderr, "failed to create spriteInvul bitmap!\n");
+	al_reserve_samples(2);
 }
 Player::~Player()
-{	
+{
 	al_destroy_bitmap(sprite);
 	al_destroy_sample(shootSound);
-	al_destroy_sample(hurtSound);	
+	al_destroy_sample(hurtSound);
 	al_destroy_timer(timerInvul);
 	delete bullet;
 }
 void Player::Update(ALLEGRO_EVENT ev)
-{	
-		Movement(ev);	
-		Shoot(ev);		
-		OOB();
+{
+	Movement(ev);
+	Shoot(ev);
+	OOB();
 }
 void Player::Movement(ALLEGRO_EVENT ev)
 {
@@ -55,8 +59,7 @@ void Player::Movement(ALLEGRO_EVENT ev)
 			contaTimer++;
 		}
 		else
-		{
-			std::cout << "yafu";
+		{			
 			invulnerable = false;
 			contaTimer = 0;
 		}
@@ -81,7 +84,7 @@ void Player::Movement(ALLEGRO_EVENT ev)
 		else if (ev.keyboard.keycode == ALLEGRO_KEY_W)
 			key[KEY_UP] = 0;
 		else if (ev.keyboard.keycode == ALLEGRO_KEY_S)
-			key[KEY_DOWN] = 0;		
+			key[KEY_DOWN] = 0;
 	}
 	if (key[KEY_LEFT])
 	{
@@ -102,11 +105,14 @@ void Player::Movement(ALLEGRO_EVENT ev)
 	{
 		y += speed;
 		bulletDir = dir(BULLET_DOWN);
-	}	
+	}
 }
 void Player::Draw() const
 {
-	al_draw_bitmap(sprite, x, y, 0);
+	if (!CanDie())
+		al_draw_bitmap(spriteInvul, x, y, 0);
+	else
+		al_draw_bitmap(sprite, x, y, 0);
 	if (bullet->GetAlive())
 		bullet->Draw();
 }
@@ -124,7 +130,7 @@ void Player::OOB()
 void Player::Shoot(ALLEGRO_EVENT ev)
 {
 	if (ev.keyboard.keycode == ALLEGRO_KEY_K && !bullet->GetAlive())
-	{		
+	{
 		al_stop_sample(&hurtID);
 		al_stop_sample(&shootID);
 		al_play_sample(shootSound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, &shootID);
@@ -151,7 +157,7 @@ bool Player::Alive() const
 }
 void Player::OnDeath()
 {
-	al_stop_sample(&hurtID);	
+	al_stop_sample(&hurtID);
 	al_stop_sample(&shootID);
 	al_play_sample(hurtSound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, &hurtID);
 	speed = 4;

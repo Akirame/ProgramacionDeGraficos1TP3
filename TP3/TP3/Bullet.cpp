@@ -58,13 +58,25 @@ void Bullet::KillBullet()
 void Bullet::OOB()
 {
 	if (y <= 0)
+	{
 		alive = false;
-	if (y >= screenHeight - height)
+		
+	}
+	if (y >= screenHeight - height*scale)
+	{
 		alive = false;
+		
+	}
 	if (x <= 0)
+	{
 		alive = false;
-	if (x >= screenWidth - width)
+		
+	}
+	if (x >= screenWidth - width*scale)
+	{
 		alive = false;
+		
+	}
 }
 void Bullet::Reset(int startX, int startY, dir _directions)
 {
@@ -101,11 +113,6 @@ bool Bullet::GetAlive() const
 void Bullet::BiggerBullet()
 {
 	scale += 1.2f;
-}
-void Bullet::SetSize(int _width, int _height)
-{
-	width = _width;
-	height = _height;
 }
 void Bullet::ResetSize()
 {

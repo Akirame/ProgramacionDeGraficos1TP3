@@ -37,8 +37,9 @@ private:
 	dir bulletDir;
 	Bullet* bullet;
 	ALLEGRO_BITMAP* sprite = NULL;
+	ALLEGRO_BITMAP* spriteInvul = NULL;
 	ALLEGRO_SAMPLE* shootSound = NULL;
-	ALLEGRO_SAMPLE* hurtSound = NULL;
+	ALLEGRO_SAMPLE* hurtSound = NULL;	
 	ALLEGRO_SAMPLE_ID shootID;
 	ALLEGRO_SAMPLE_ID hurtID;
 	ALLEGRO_TIMER* timerInvul;

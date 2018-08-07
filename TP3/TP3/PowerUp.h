@@ -28,6 +28,8 @@ private:
 	ALLEGRO_BITMAP* spriteInvul = NULL;
 	ALLEGRO_BITMAP* spriteBig = NULL;
 	ALLEGRO_BITMAP* spriteLives = NULL;
+	ALLEGRO_SAMPLE* powerUpSound = NULL;
+	ALLEGRO_SAMPLE_ID powerUpID;
 	typeOfPower typePower;
 	bool alive;
 public:

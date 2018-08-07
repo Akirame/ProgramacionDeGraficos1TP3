@@ -21,6 +21,11 @@ PowerUp::PowerUp(int _screenWidth, int _screenHeight) :
 	spriteLives = al_load_bitmap("assets/lives.png");
 	if (!spriteLives)
 		fprintf(stderr, "failed to create spriteLives bitmap!\n");
+	powerUpSound = al_load_sample("assets/powerUpSound.wav");
+	if (!powerUpSound) {
+		fprintf(stderr, "Audio clip sample not loaded!\n");
+		al_reserve_samples(1);
+	}
 }
 PowerUp::~PowerUp()
 {
@@ -31,6 +36,8 @@ PowerUp::~PowerUp()
 }
 void PowerUp::ActivePower(Player* &p)
 {
+	al_stop_samples();
+	al_play_sample(powerUpSound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, &powerUpID);
 	switch (typePower)
 	{
 	case BIGBULLET:
