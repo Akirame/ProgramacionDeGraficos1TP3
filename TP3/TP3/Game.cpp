@@ -368,7 +368,7 @@ int Game::UpdateGame()
 					secondPlayer->Update(ev);
 				if (ev.keyboard.keycode == ALLEGRO_KEY_Z)
 				{
-					pUp->Spawn();
+					ResetPlayers();
 				}
 			}
 			else if (ev.type == ALLEGRO_EVENT_KEY_UP)
@@ -386,10 +386,9 @@ int Game::UpdateGame()
 				player->Draw();
 				secondPlayer->Draw();
 				pUp->Draw();
-				al_draw_text(livesText, al_map_rgb(255, 255, 255), SCREEN_W / 2, 10, ALLEGRO_ALIGN_CENTRE, ((string)"1P " + (string)player->GetLives().c_str() + (string)" - 2P " + (string)secondPlayer->GetLives().c_str()).c_str());
+				al_draw_text(livesText, al_map_rgb(255, 255, 255), SCREEN_W / 2, 10, ALLEGRO_ALIGN_CENTRE, ((string)"Blue " + (string)player->GetLives().c_str() + (string)" - Red " + (string)secondPlayer->GetLives().c_str()).c_str());
 				al_flip_display();
 			}
-
 		}
 	}
 #pragma endregion	
@@ -517,9 +516,11 @@ void Game::Difficulty()
 void Game::ResetPlayers()
 {
 	if (player)
-		player->ResetPos(SCREEN_W / 3, SCREEN_H / 2);
+		player->ResetPos(rand() % (SCREEN_W / 2), rand() % SCREEN_H);
+		//player->ResetPos(SCREEN_W / 3, SCREEN_H / 2);
 	if (secondPlayer)
-		secondPlayer->ResetPos(SCREEN_W / 3 * 2, SCREEN_H / 2);	
+		secondPlayer->ResetPos(rand() % (SCREEN_W + SCREEN_W / 2), rand() % SCREEN_H);
+		//secondPlayer->ResetPos(SCREEN_W / 3 * 2, SCREEN_H / 2);	
 }
 
 
