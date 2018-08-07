@@ -1,6 +1,10 @@
 #include "PowerUp.h"
 
-PowerUp::PowerUp(int _screenWidth, int _screenHeight) : screenWidth(_screenWidth), screenHeight(_screenHeight),alive(false)
+PowerUp::PowerUp(int _screenWidth, int _screenHeight) : 
+	screenWidth(_screenWidth), screenHeight(_screenHeight),
+	alive(false),
+	width(32),
+	height(32)
 {		
 	spriteBig = al_load_bitmap("assets/bigBullet.png");
 	if (!spriteBig)
@@ -81,7 +85,7 @@ void PowerUp::Draw() const
 	if (alive)
 	{
 		switch (typePower)
-		{
+		{			
 		case BIGBULLET:
 			al_draw_bitmap(spriteBig, x, y, 0);
 			break;
@@ -92,7 +96,7 @@ void PowerUp::Draw() const
 			al_draw_bitmap(spriteInvul, x, y, 0);
 			break;
 		case LIVES:
-			al_draw_bitmap(spriteInvul, x, y, 0);
+			al_draw_bitmap(spriteLives, x, y, 0);
 			break;
 		}
 	}	
@@ -102,6 +106,7 @@ void PowerUp::Spawn()
 	x = rand() % (screenWidth - width);
 	y = rand() % (screenHeight - height);
 	typePower = typeOfPower(rand()% LAST);
+	std::cout << typePower;
 	alive = true;
 }
 

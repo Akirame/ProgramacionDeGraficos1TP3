@@ -107,3 +107,7 @@ void Bullet::SetSize(int _width, int _height)
 	width = _width;
 	height = _height;
 }
+void Bullet::ResetSize()
+{
+	scale = 1;
+}

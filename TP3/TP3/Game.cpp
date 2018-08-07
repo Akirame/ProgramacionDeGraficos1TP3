@@ -183,6 +183,7 @@ int Game::UpdateGame()
 				if (bounding_box_collision(player->GetX(), player->GetY(), player->GetWidht(), player->GetHeight(),
 					iter->GetX(), iter->GetY(), iter->GetWidht(), iter->GetHeight()))
 				{
+					if(player->CanDie())
 					player->OnDeath();
 					iter->Reset();
 				}

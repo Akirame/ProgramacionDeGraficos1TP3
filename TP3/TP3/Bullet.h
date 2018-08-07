@@ -42,5 +42,6 @@ public:
 	void OOB();
 	void Draw() const;
 	void SetSize(int _width, int _height);
+	void ResetSize();
 };
 #endif

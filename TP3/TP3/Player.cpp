@@ -1,20 +1,16 @@
 	#include "Player.h"
 
-Player::Player(int _screenWidth, int _screenHeight) : screenWidth(_screenWidth),screenHeight(_screenHeight)
+Player::Player(int _screenWidth, int _screenHeight) :
+	screenWidth(_screenWidth), screenHeight(_screenHeight),
+	width(32), height(32),
+	speed(4),
+	lives(3),
+	invulnerable(false),
+	contaTimer(0), contaInvul(360),
+	contaSpeedUpgrades(0), contaBiggerUpgrades(0),
+	x(screenWidth / 2 - width / 2), y(screenHeight / 2 - height / 2),
+	bulletDir(dir(BULLET_RIGHT))
 {
-	width = 32;
-	height = 32;
-	speed = 4;
-	lives = 3;
-
-	invulnerable = false;
-	contaTimer = 0;
-	contaInvul = 5;
-	contaSpeedUpgrades = 0;
-	contaBiggerUpgrades = 0;
-	x = screenWidth / 2 - width / 2;
-	y = screenHeight / 2 - height / 2;
-	bulletDir = dir(BULLET_RIGHT);
 	bullet = new Bullet(x, y, screenWidth, screenHeight, bulletDir);
 
 	sprite = al_load_bitmap("assets/player.png");
@@ -56,10 +52,11 @@ void Player::Movement(ALLEGRO_EVENT ev)
 	{
 		if (contaTimer < contaInvul)
 		{
-			contaTimer += 0.1 / 60; //1 fps
+			contaTimer++;
 		}
 		else
 		{
+			std::cout << "yafu";
 			invulnerable = false;
 			contaTimer = 0;
 		}
@@ -157,6 +154,10 @@ void Player::OnDeath()
 	al_stop_sample(&hurtID);	
 	al_stop_sample(&shootID);
 	al_play_sample(hurtSound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, &hurtID);
+	speed = 4;
+	contaSpeedUpgrades = 0;
+	contaBiggerUpgrades = 0;
+	bullet->ResetSize();
 	lives--;
 }
 float Player::GetX() const
