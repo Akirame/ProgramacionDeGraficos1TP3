@@ -12,6 +12,7 @@ Bullet::Bullet(int startX,int startY, int _screenWidth, int _screenHeight,dir _d
 	y = screenHeight / 2 - height / 2;
 	direction = _direction;
 	speed = 7;
+	scale = 1;
 	sprite = al_load_bitmap("assets/bullet.png");
 	if (!sprite)
 		fprintf(stderr, "failed to create player bitmap!\n");
@@ -26,8 +27,8 @@ void Bullet::Update()
 	OOB();
 }
 void Bullet::Draw() const
-{
-	al_draw_bitmap(sprite, x, y, 0);
+{	
+	al_draw_scaled_bitmap(sprite, 0, 0, width, height, x, y, width*scale, height*scale, 0);
 }
 //dependiendo de la Dir se mueve diferente
 void Bullet::Movement()
@@ -83,7 +84,7 @@ float Bullet::GetY() const
 }
 float Bullet::GetHeight() const
 {
-	return height;
+	return height * scale;
 }
 float Bullet::GetWidht() const
 {
@@ -99,8 +100,7 @@ bool Bullet::GetAlive() const
 }
 void Bullet::BiggerBullet()
 {
-	height += 10;
-	width += 10;
+	scale += 1.2f;
 }
 void Bullet::SetSize(int _width, int _height)
 {

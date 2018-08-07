@@ -22,6 +22,7 @@ private:
 	float y;
 	float speed;
 	bool alive;
+	float scale;
 	dir direction;
 	ALLEGRO_BITMAP* sprite = NULL;
 public:
