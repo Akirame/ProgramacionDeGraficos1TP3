@@ -69,6 +69,7 @@ public:
 	void SetInvulnerable(bool toSet);
 	void MoreSpeed();
 	void BiggerBullet();
+	void ResetPos(float posX, float posY);
 };
 #endif
 

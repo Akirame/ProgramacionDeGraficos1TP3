@@ -272,3 +272,8 @@ void Player::BiggerBullet()
 		contaBiggerUpgrades++;
 	}
 }
+void Player::ResetPos(float posX, float posY)
+{
+	x = posX;
+	y = posY;
+}

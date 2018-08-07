@@ -15,6 +15,10 @@ Game::Game() :
 {
 	srand(time(0));
 	enemies = new list<Enemy>();
+	if (vsMode)
+		respawnUpgrade = 360;
+	else
+		respawnUpgrade = 180;
 }
 Game::~Game()
 {
@@ -176,6 +180,7 @@ int Game::MainMenu()
 }
 int Game::UpdateGame()
 {
+#pragma region Single Player Mode
 	if (!vsMode)
 	{
 		while (!_gameOver)
@@ -217,7 +222,7 @@ int Game::UpdateGame()
 					}
 
 				}
-				if (contaUpgrades < 360)
+				if (contaUpgrades < respawnUpgrade)
 				{
 					contaUpgrades++;
 				}
@@ -267,8 +272,11 @@ int Game::UpdateGame()
 
 		}
 	}
+#pragma endregion
+#pragma region VsMode
 	else
 	{
+		ResetPlayers();
 		while (!_gameOver)
 		{
 			ALLEGRO_EVENT ev;
@@ -286,9 +294,13 @@ int Game::UpdateGame()
 					if (bounding_box_collision(player->GetBullet()->GetX(), player->GetBullet()->GetY(), player->GetBullet()->GetWidht(), player->GetBullet()->GetHeight()
 						, secondPlayer->GetX(), secondPlayer->GetY(), secondPlayer->GetWidht(), secondPlayer->GetHeight()))
 					{
-						player->GetBullet()->KillBullet();		
-						if(secondPlayer->CanDie())
-						secondPlayer->OnDeath();
+						player->GetBullet()->KillBullet();
+						if (secondPlayer->CanDie())
+						{
+							secondPlayer->OnDeath();
+							ResetPlayers();
+							al_rest(0.5);
+						}
 					}
 				}
 				//2nd player bala contra 1st
@@ -297,9 +309,13 @@ int Game::UpdateGame()
 					if (bounding_box_collision(secondPlayer->GetBullet()->GetX(), secondPlayer->GetBullet()->GetY(), secondPlayer->GetBullet()->GetWidht(), secondPlayer->GetBullet()->GetHeight()
 						, player->GetX(), player->GetY(), player->GetWidht(), player->GetHeight()))
 					{
-						secondPlayer->GetBullet()->KillBullet();						
-						if(player->CanDie())
-						player->OnDeath();
+						secondPlayer->GetBullet()->KillBullet();
+						if (player->CanDie())
+						{
+							player->OnDeath();
+							ResetPlayers();
+							al_rest(0.5);
+						}
 					}
 				}
 				//ambas balas
@@ -327,7 +343,7 @@ int Game::UpdateGame()
 						contaUpgrades = 0;
 					}
 				}
-				if (contaUpgrades < 360)
+				if (contaUpgrades < respawnUpgrade)
 				{
 					contaUpgrades++;
 				}
@@ -336,7 +352,7 @@ int Game::UpdateGame()
 					pUp->Spawn();
 					contaUpgrades = 0;
 				}
-				GameOver();				
+				GameOver();
 				redraw = true;
 			}
 			else if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
@@ -369,19 +385,28 @@ int Game::UpdateGame()
 				al_clear_to_color(al_map_rgb(0, 40, 0));
 				player->Draw();
 				secondPlayer->Draw();
-				pUp->Draw();											
-				al_draw_text(livesText, al_map_rgb(255, 255, 255), SCREEN_W / 2, 10, ALLEGRO_ALIGN_CENTRE, ((string)"1P "+(string)player->GetLives().c_str() + (string)" - 2P " + (string)secondPlayer->GetLives().c_str()).c_str());
+				pUp->Draw();
+				al_draw_text(livesText, al_map_rgb(255, 255, 255), SCREEN_W / 2, 10, ALLEGRO_ALIGN_CENTRE, ((string)"1P " + (string)player->GetLives().c_str() + (string)" - 2P " + (string)secondPlayer->GetLives().c_str()).c_str());
 				al_flip_display();
 			}
 
 		}
 	}
+#pragma endregion	
 	return 0;
 }
 int Game::FinalMenu()
 {
-	scoreText = al_load_ttf_font("assets/arial_narrow_7.ttf", 72, 0);
-	livesText = al_load_ttf_font("assets/arial_narrow_7.ttf", 72, 0);
+	if (!vsMode)
+	{
+		scoreText = al_load_ttf_font("assets/arial_narrow_7.ttf", 72, 0);
+		livesText = al_load_ttf_font("assets/arial_narrow_7.ttf", 72, 0);
+	}
+	else
+	{
+		scoreText = al_load_ttf_font("assets/arial_narrow_7.ttf", 48, 0);
+		livesText = al_load_ttf_font("assets/arial_narrow_7.ttf", 48, 0);
+	}
 	while (_finalMenu)
 	{
 		ALLEGRO_EVENT ev;
@@ -401,10 +426,26 @@ int Game::FinalMenu()
 				_finalMenu = false;
 		}
 		if (redraw && al_is_event_queue_empty(event_queue))
-		{
+		{			
 			redraw = false;
 			al_clear_to_color(al_map_rgb(0, 0, 0));
+			if(!vsMode)				
 			al_draw_text(scoreText, al_map_rgb(255, 255, 255), SCREEN_W / 3, (SCREEN_H / 3), ALLEGRO_ALIGN_CENTRE, GetScore().c_str());
+			else
+			{
+				switch (winner)
+				{
+				case 0:
+					al_draw_text(scoreText, al_map_rgb(255, 255, 255), SCREEN_W / 3, (SCREEN_H / 3), ALLEGRO_ALIGN_CENTRE, ((string)"DRAW!").c_str());
+					break;
+				case 1:
+					al_draw_text(scoreText, al_map_rgb(0, 0, 255), SCREEN_W / 3, (SCREEN_H / 3), ALLEGRO_ALIGN_CENTRE, ((string)"Blue player Wins!").c_str());
+					break;
+				case -1:
+					al_draw_text(scoreText, al_map_rgb(255, 0, 0), SCREEN_W / 3, (SCREEN_H / 3), ALLEGRO_ALIGN_CENTRE, ((string)"Red player Wins!").c_str());
+					break;
+				}				
+			}
 			al_flip_display();
 		}
 	}
@@ -472,6 +513,13 @@ void Game::Difficulty()
 		}
 		enemiesStronger = true;
 	}
+}
+void Game::ResetPlayers()
+{
+	if (player)
+		player->ResetPos(SCREEN_W / 3, SCREEN_H / 2);
+	if (secondPlayer)
+		secondPlayer->ResetPos(SCREEN_W / 3 * 2, SCREEN_H / 2);	
 }
 
 

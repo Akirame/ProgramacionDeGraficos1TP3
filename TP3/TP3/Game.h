@@ -13,7 +13,7 @@
 #include "Player.h"
 #include "Enemy.h"
 #include "PowerUp.h"
-#define RESPAWN_UPGRADE 20
+
 using namespace std;
 
 class Game
@@ -43,6 +43,7 @@ private:
 	int score;
 	int cantEnemies;
 	int contaUpgrades;
+	int respawnUpgrade;
 public:
 	Game();
 	~Game();
@@ -55,6 +56,7 @@ public:
 	std::string GetScore();
 	void GameOver();
 	void Difficulty();
+	void ResetPlayers();
 };
 #endif
 
