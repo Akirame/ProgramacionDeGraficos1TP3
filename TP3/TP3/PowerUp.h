@@ -24,6 +24,10 @@ private:
 	float x;
 	float y;
 	ALLEGRO_BITMAP* sprite = NULL;
+	ALLEGRO_BITMAP* spriteSpeed = NULL;
+	ALLEGRO_BITMAP* spriteInvul = NULL;
+	ALLEGRO_BITMAP* spriteBig = NULL;
+	ALLEGRO_BITMAP* spriteLives = NULL;
 	typeOfPower typePower;
 	bool alive;
 public:
@@ -37,7 +41,7 @@ public:
 	float GetWidht() const;	
 	typeOfPower GetType() const;
 	ALLEGRO_BITMAP* GetBitmap();
-	void ActivePower(Player &p);
+	void ActivePower(Player* &p);
 	void Draw() const;
 	void Spawn();
 	bool Alive();

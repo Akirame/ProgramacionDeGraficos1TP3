@@ -18,8 +18,8 @@ Game::Game()
 	enemiesStronger = false;
 }
 Game::~Game()
-{	
-	delete player;			
+{
+	delete player;
 	enemies->clear();
 	delete enemies;
 	al_destroy_timer(timer);
@@ -30,7 +30,7 @@ Game::~Game()
 }
 bool Game::InitAll()
 {
-	
+
 	if (!al_init()) {
 		fprintf(stderr, "failed to initialize allegro!\n");
 		return false;
@@ -105,8 +105,8 @@ bool Game::InitAll()
 
 	//Instanciacion enemigos
 	for (int i = 0; i < cantEnemies; i++)
-	{		
-		Enemy* enemy = new Enemy(SCREEN_W, SCREEN_H); 
+	{
+		Enemy* enemy = new Enemy(SCREEN_W, SCREEN_H);
 		enemies->push_front(*enemy);
 	}
 	iterEnemyBegin = enemies->begin();
@@ -166,7 +166,7 @@ int Game::MainMenu()
 	return 0;
 }
 int Game::UpdateGame()
-{	
+{
 	while (!_gameOver)
 	{
 		ALLEGRO_EVENT ev;
@@ -180,28 +180,39 @@ int Game::UpdateGame()
 			for (list<Enemy>::iterator iter = iterEnemyBegin; iter != iterEnemyEnd; iter++)
 			{
 				iter->Update(ev);
-					if (bounding_box_collision(player->GetX(), player->GetY(), player->GetWidht(), player->GetHeight(),
-						iter->GetX(), iter->GetY(), iter->GetWidht(), iter->GetHeight()))
+				if (bounding_box_collision(player->GetX(), player->GetY(), player->GetWidht(), player->GetHeight(),
+					iter->GetX(), iter->GetY(), iter->GetWidht(), iter->GetHeight()))
+				{
+					player->OnDeath();
+					iter->Reset();
+				}
+				if (player->GetBullet()->GetAlive())
+					if (bounding_box_collision(player->GetBullet()->GetX(), player->GetBullet()->GetY(), player->GetBullet()->GetWidht(), player->GetBullet()->GetHeight()
+						, iter->GetX(), iter->GetY(), iter->GetWidht(), iter->GetHeight()))
 					{
-						player->OnDeath();
+						player->GetBullet()->KillBullet();
+						AddScore();
 						iter->Reset();
 					}
-					if (player->GetBullet()->GetAlive())
-						if (bounding_box_collision(player->GetBullet()->GetX(), player->GetBullet()->GetY(), player->GetBullet()->GetWidht(), player->GetBullet()->GetHeight()
-							, iter->GetX(), iter->GetY(), iter->GetWidht(), iter->GetHeight()))
-						{
-							player->GetBullet()->KillBullet();
-							AddScore();
-							iter->Reset();
-						}
+				if (pUp->Alive())
+				{
+					if (bounding_box_collision(player->GetX(), player->GetY(), player->GetWidht(), player->GetHeight(),
+						pUp->GetX(), pUp->GetY(), pUp->GetWidht(), pUp->GetHeight()))
+					{
+						pUp->ActivePower(player);
+						contaUpgrades = -200;
+					}
 				}
-			if (contaUpgrades < RESPAWN_UPGRADE)
+				
+			}
+			if (contaUpgrades < 360)
 			{
-				contaUpgrades += 1 / FPS;
+				contaUpgrades++;				
 			}
 			else
 			{
-
+				pUp->Spawn();
+				contaUpgrades = 0;
 			}
 			GameOver();
 			Difficulty();
@@ -216,6 +227,10 @@ int Game::UpdateGame()
 		{
 			if (player)
 				player->Update(ev);
+			if (ev.keyboard.keycode == ALLEGRO_KEY_Z)
+			{
+				pUp->Spawn();
+			}				
 		}
 		else if (ev.type == ALLEGRO_EVENT_KEY_UP)
 		{
@@ -228,22 +243,23 @@ int Game::UpdateGame()
 
 			al_clear_to_color(al_map_rgb(0, 40, 0));
 			player->Draw();
+			pUp->Draw();
 			for (list<Enemy>::iterator iter = iterEnemyBegin; iter != iterEnemyEnd; iter++)
 			{
 				iter->Draw();
 			}
-			al_draw_text(scoreText, al_map_rgb(255, 255, 255),70, 1, ALLEGRO_ALIGN_CENTRE, GetScore().c_str());
-			al_draw_text(livesText, al_map_rgb(255, 255, 255),60, 40, ALLEGRO_ALIGN_CENTRE, player->GetLives().c_str());
+			al_draw_text(scoreText, al_map_rgb(255, 255, 255), 70, 1, ALLEGRO_ALIGN_CENTRE, GetScore().c_str());
+			al_draw_text(livesText, al_map_rgb(255, 255, 255), 60, 40, ALLEGRO_ALIGN_CENTRE, player->GetLives().c_str());
 			al_flip_display();
 		}
-		
+
 	}
 	return 0;
 }
 int Game::FinalMenu()
 {
 	scoreText = al_load_ttf_font("assets/arial_narrow_7.ttf", 72, 0);
-	livesText = al_load_ttf_font("assets/arial_narrow_7.ttf", 72, 0);	
+	livesText = al_load_ttf_font("assets/arial_narrow_7.ttf", 72, 0);
 	while (_finalMenu)
 	{
 		ALLEGRO_EVENT ev;
@@ -255,7 +271,7 @@ int Game::FinalMenu()
 		}
 		else if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
 		{
-			_finalMenu = false;			
+			_finalMenu = false;
 		}
 		else if (ev.type == ALLEGRO_EVENT_KEY_DOWN)
 		{
@@ -266,7 +282,7 @@ int Game::FinalMenu()
 		{
 			redraw = false;
 			al_clear_to_color(al_map_rgb(0, 0, 0));
-			al_draw_text(scoreText, al_map_rgb(255, 255, 255), SCREEN_W / 3, (SCREEN_H/ 3), ALLEGRO_ALIGN_CENTRE, GetScore().c_str());			
+			al_draw_text(scoreText, al_map_rgb(255, 255, 255), SCREEN_W / 3, (SCREEN_H / 3), ALLEGRO_ALIGN_CENTRE, GetScore().c_str());
 			al_flip_display();
 		}
 	}
@@ -302,7 +318,7 @@ void Game::GameOver()
 	else
 		_gameOver = true;
 }
-void Game::Difficulty() 
+void Game::Difficulty()
 {
 	if (score >= 200 && !enemiesStronger)
 	{

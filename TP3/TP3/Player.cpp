@@ -1,4 +1,4 @@
-#include "Player.h"
+	#include "Player.h"
 
 Player::Player(int _screenWidth, int _screenHeight) : screenWidth(_screenWidth),screenHeight(_screenHeight)
 {

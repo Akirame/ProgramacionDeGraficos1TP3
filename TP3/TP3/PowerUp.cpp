@@ -1,28 +1,45 @@
 #include "PowerUp.h"
 
-PowerUp::PowerUp(int _screenWidth, int _screenHeight) : screenWidth(_screenWidth), screenHeight(_screenHeight)
-{	
-	alive = false;
+PowerUp::PowerUp(int _screenWidth, int _screenHeight) : screenWidth(_screenWidth), screenHeight(_screenHeight),alive(false)
+{		
+	spriteBig = al_load_bitmap("assets/bigBullet.png");
+	if (!spriteBig)
+		fprintf(stderr, "failed to create spriteBig bitmap!\n");
+
+	spriteSpeed = al_load_bitmap("assets/speed.png");
+	if (!spriteSpeed)
+		fprintf(stderr, "failed to create spriteSpeed bitmap!\n");
+
+	spriteInvul = al_load_bitmap("assets/invul.png");
+	if (!spriteInvul)
+		fprintf(stderr, "failed to create spriteInvul bitmap!\n");
+
+	spriteLives = al_load_bitmap("assets/lives.png");
+	if (!spriteLives)
+		fprintf(stderr, "failed to create spriteLives bitmap!\n");
 }
 PowerUp::~PowerUp()
 {
-	al_destroy_bitmap(sprite);
+	al_destroy_bitmap(spriteBig);
+	al_destroy_bitmap(spriteSpeed);
+	al_destroy_bitmap(spriteInvul);
+	al_destroy_bitmap(spriteLives);
 }
-void PowerUp::ActivePower(Player &p)
+void PowerUp::ActivePower(Player* &p)
 {
 	switch (typePower)
 	{
 	case BIGBULLET:
-		p.BiggerBullet();
+		p->BiggerBullet();
 		break;
 	case SPEED:
-		p.MoreSpeed();
+		p->MoreSpeed();
 		break;
 	case INVUL:
-		p.SetInvulnerable(true);
+		p->SetInvulnerable(true);
 		break;
 	case LIVES:
-		p.AddLives(1);
+		p->AddLives(1);
 		break;	
 	}
 	alive = false;
@@ -60,14 +77,31 @@ typeOfPower PowerUp::GetType() const
 	return typePower;
 }
 void PowerUp::Draw() const
-{	
-	al_draw_bitmap(sprite, x, y, 0);
+{		
+	if (alive)
+	{
+		switch (typePower)
+		{
+		case BIGBULLET:
+			al_draw_bitmap(spriteBig, x, y, 0);
+			break;
+		case SPEED:
+			al_draw_bitmap(spriteSpeed, x, y, 0);
+			break;
+		case INVUL:
+			al_draw_bitmap(spriteInvul, x, y, 0);
+			break;
+		case LIVES:
+			al_draw_bitmap(spriteInvul, x, y, 0);
+			break;
+		}
+	}	
 }
 void PowerUp::Spawn()
 {
-	x = rand() % screenWidth;
-	y = rand() % screenHeight;
-	typePower = typeOfPower(rand() & LAST);
+	x = rand() % (screenWidth - width);
+	y = rand() % (screenHeight - height);
+	typePower = typeOfPower(rand()% LAST);
 	alive = true;
 }
 
