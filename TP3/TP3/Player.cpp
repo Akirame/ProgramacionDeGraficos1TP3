@@ -1,6 +1,6 @@
 #include "Player.h"
 
-Player::Player(int _screenWidth, int _screenHeight) :
+Player::Player(int _screenWidth, int _screenHeight,bool _scndPlayer) :
 	screenWidth(_screenWidth), screenHeight(_screenHeight),
 	width(32), height(32),
 	speed(4),
@@ -9,11 +9,15 @@ Player::Player(int _screenWidth, int _screenHeight) :
 	contaTimer(0), contaInvul(360),
 	contaSpeedUpgrades(0), contaBiggerUpgrades(0),
 	x(screenWidth / 2 - width / 2), y(screenHeight / 2 - height / 2),
-	bulletDir(dir(BULLET_RIGHT))
+	bulletDir(dir(BULLET_RIGHT)),
+	secondPlayer(_scndPlayer)
 {
 	bullet = new Bullet(x, y, screenWidth, screenHeight, bulletDir);
 
-	sprite = al_load_bitmap("assets/player.png");
+	if (!secondPlayer)
+		sprite = al_load_bitmap("assets/player.png");
+	else
+		sprite = al_load_bitmap("assets/playerSecond.png");
 	if (!sprite)
 		fprintf(stderr, "failed to create player bitmap!\n");
 
@@ -64,28 +68,57 @@ void Player::Movement(ALLEGRO_EVENT ev)
 			contaTimer = 0;
 		}
 	}
-	if (ev.type == ALLEGRO_EVENT_KEY_DOWN)
+	if (!secondPlayer)
 	{
-		if (ev.keyboard.keycode == ALLEGRO_KEY_A)
-			key[KEY_LEFT] = 1;
-		else if (ev.keyboard.keycode == ALLEGRO_KEY_D)
-			key[KEY_RIGHT] = 1;
-		else if (ev.keyboard.keycode == ALLEGRO_KEY_W)
-			key[KEY_UP] = 1;
-		else if (ev.keyboard.keycode == ALLEGRO_KEY_S)
-			key[KEY_DOWN] = 1;
+		if (ev.type == ALLEGRO_EVENT_KEY_DOWN)
+		{
+			if (ev.keyboard.keycode == ALLEGRO_KEY_A)
+				key[KEY_LEFT] = 1;
+			else if (ev.keyboard.keycode == ALLEGRO_KEY_D)
+				key[KEY_RIGHT] = 1;
+			else if (ev.keyboard.keycode == ALLEGRO_KEY_W)
+				key[KEY_UP] = 1;
+			else if (ev.keyboard.keycode == ALLEGRO_KEY_S)
+				key[KEY_DOWN] = 1;
+		}
+		if (ev.type == ALLEGRO_EVENT_KEY_UP)
+		{
+			if (ev.keyboard.keycode == ALLEGRO_KEY_A)
+				key[KEY_LEFT] = 0;
+			else if (ev.keyboard.keycode == ALLEGRO_KEY_D)
+				key[KEY_RIGHT] = 0;
+			else if (ev.keyboard.keycode == ALLEGRO_KEY_W)
+				key[KEY_UP] = 0;
+			else if (ev.keyboard.keycode == ALLEGRO_KEY_S)
+				key[KEY_DOWN] = 0;
+		}
 	}
-	if (ev.type == ALLEGRO_EVENT_KEY_UP)
+	else
 	{
-		if (ev.keyboard.keycode == ALLEGRO_KEY_A)
-			key[KEY_LEFT] = 0;
-		else if (ev.keyboard.keycode == ALLEGRO_KEY_D)
-			key[KEY_RIGHT] = 0;
-		else if (ev.keyboard.keycode == ALLEGRO_KEY_W)
-			key[KEY_UP] = 0;
-		else if (ev.keyboard.keycode == ALLEGRO_KEY_S)
-			key[KEY_DOWN] = 0;
+		if (ev.type == ALLEGRO_EVENT_KEY_DOWN)
+		{
+			if (ev.keyboard.keycode == ALLEGRO_KEY_LEFT)
+				key[KEY_LEFT] = 1;
+			else if (ev.keyboard.keycode == ALLEGRO_KEY_RIGHT)
+				key[KEY_RIGHT] = 1;
+			else if (ev.keyboard.keycode == ALLEGRO_KEY_UP)
+				key[KEY_UP] = 1;
+			else if (ev.keyboard.keycode == ALLEGRO_KEY_DOWN)
+				key[KEY_DOWN] = 1;
+		}
+		if (ev.type == ALLEGRO_EVENT_KEY_UP)
+		{
+			if (ev.keyboard.keycode == ALLEGRO_KEY_LEFT)
+				key[KEY_LEFT] = 0;
+			else if (ev.keyboard.keycode == ALLEGRO_KEY_RIGHT)
+				key[KEY_RIGHT] = 0;
+			else if (ev.keyboard.keycode == ALLEGRO_KEY_UP)
+				key[KEY_UP] = 0;
+			else if (ev.keyboard.keycode == ALLEGRO_KEY_DOWN)
+				key[KEY_DOWN] = 0;
+		}
 	}
+
 	if (key[KEY_LEFT])
 	{
 		x -= speed;
@@ -129,12 +162,25 @@ void Player::OOB()
 }
 void Player::Shoot(ALLEGRO_EVENT ev)
 {
-	if (ev.keyboard.keycode == ALLEGRO_KEY_K && !bullet->GetAlive())
+	if (!secondPlayer)
 	{
-		al_stop_sample(&hurtID);
-		al_stop_sample(&shootID);
-		al_play_sample(shootSound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, &shootID);
-		bullet->Reset(x, y, bulletDir);
+		if (ev.keyboard.keycode == ALLEGRO_KEY_K && !bullet->GetAlive())
+		{
+			al_stop_sample(&hurtID);
+			al_stop_sample(&shootID);
+			al_play_sample(shootSound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, &shootID);
+			bullet->Reset(x, y, bulletDir);
+		}
+	}
+	else
+	{
+		if (ev.keyboard.keycode == ALLEGRO_KEY_PAD_1 && !bullet->GetAlive())
+		{
+			al_stop_sample(&hurtID);
+			al_stop_sample(&shootID);
+			al_play_sample(shootSound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, &shootID);
+			bullet->Reset(x, y, bulletDir);
+		}
 	}
 	if (bullet->GetAlive())
 		bullet->Update();

@@ -34,6 +34,7 @@ private:
 	int lives;
 	int key[4] = { 0,0,0,0 };
 	bool invulnerable;
+	bool secondPlayer;
 	dir bulletDir;
 	Bullet* bullet;
 	ALLEGRO_BITMAP* sprite = NULL;
@@ -42,9 +43,9 @@ private:
 	ALLEGRO_SAMPLE* hurtSound = NULL;	
 	ALLEGRO_SAMPLE_ID shootID;
 	ALLEGRO_SAMPLE_ID hurtID;
-	ALLEGRO_TIMER* timerInvul;
+	ALLEGRO_TIMER* timerInvul;	
 public:
-	Player(int screenWidth, int screenHeight);
+	Player(int screenWidth, int screenHeight,bool _scndPlayer);
 	~Player();
 
 	void Movement(ALLEGRO_EVENT ev);

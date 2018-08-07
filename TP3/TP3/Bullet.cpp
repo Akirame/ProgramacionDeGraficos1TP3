@@ -1,18 +1,16 @@
 #include "Bullet.h"
 
 
-Bullet::Bullet(int startX,int startY, int _screenWidth, int _screenHeight,dir _direction)
+Bullet::Bullet(int startX, int startY, int _screenWidth, int _screenHeight, dir _direction) :
+	alive(false),
+	width(12), height(12),
+	screenWidth(_screenWidth),screenHeight(_screenHeight),
+	x(screenWidth/2-width*scale/2),
+	y(screenHeight/2-height * scale/2),
+	direction(_direction),
+	speed(7),
+	scale(1)
 {
-	alive = false;
-	width = 12;
-	height = 12;
-	screenWidth = _screenWidth;
-	screenHeight = _screenHeight;
-	x = screenWidth / 2 - width / 2;
-	y = screenHeight / 2 - height / 2;
-	direction = _direction;
-	speed = 7;
-	scale = 1;
 	sprite = al_load_bitmap("assets/bullet.png");
 	if (!sprite)
 		fprintf(stderr, "failed to create player bitmap!\n");

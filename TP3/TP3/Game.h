@@ -28,6 +28,7 @@ private:
 	ALLEGRO_FONT* scoreText;
 	ALLEGRO_FONT* livesText;	
 	Player* player;
+	Player* secondPlayer;
 	PowerUp* pUp;
 	list<Enemy>* enemies;
 	list<Enemy>::iterator iterEnemyBegin;
@@ -36,7 +37,9 @@ private:
 	bool _menu;
 	bool _finalMenu;
 	bool redraw;
+	bool vsMode;
 	bool enemiesStronger;
+	int winner;
 	int score;
 	int cantEnemies;
 	int contaUpgrades;

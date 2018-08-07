@@ -1,21 +1,20 @@
 #include "Game.h"
 
-Game::Game()
+Game::Game() :
+	display(NULL), event_queue(NULL), timer(NULL),
+	scoreText(NULL), livesText(NULL),
+	_gameOver(false),
+	_menu(true),
+	_finalMenu(true),
+	redraw(true),
+	score(0),
+	cantEnemies(4),
+	enemiesStronger(false),
+	vsMode(false),
+	winner(0)
 {
 	srand(time(0));
-	display = NULL;
-	event_queue = NULL;
-	timer = NULL;
-	scoreText = NULL;
-	livesText = NULL;
 	enemies = new list<Enemy>();
-	_gameOver = false;
-	_menu = true;
-	_finalMenu = true;
-	redraw = true;
-	score = 0;
-	cantEnemies = 4;
-	enemiesStronger = false;
 }
 Game::~Game()
 {
@@ -100,7 +99,8 @@ bool Game::InitAll()
 		return -1;
 	}
 
-	player = new Player(SCREEN_W, SCREEN_H);
+	player = new Player(SCREEN_W, SCREEN_H, false);
+	secondPlayer = new Player(SCREEN_H, SCREEN_H, true);
 	pUp = new PowerUp(SCREEN_W, SCREEN_H);
 
 	//Instanciacion enemigos
@@ -153,13 +153,22 @@ int Game::MainMenu()
 		else if (ev.type == ALLEGRO_EVENT_KEY_DOWN)
 		{
 			if (ev.keyboard.keycode == ALLEGRO_KEY_SPACE)
+			{
 				_menu = false;
+				vsMode = false;
+			}
+			else if (ev.keyboard.keycode == ALLEGRO_KEY_ENTER)
+			{
+				_menu = false;
+				vsMode = true;
+			}
 		}
 		if (redraw && al_is_event_queue_empty(event_queue))
 		{
 			redraw = false;
 			al_clear_to_color(al_map_rgb(0, 0, 0));
-			al_draw_text(scoreText, al_map_rgb(255, 255, 255), 640 / 2, (480 / 3), ALLEGRO_ALIGN_CENTRE, "Press Space to start!");
+			al_draw_text(scoreText, al_map_rgb(255, 255, 255), 640 / 2, (480 / 3), ALLEGRO_ALIGN_CENTRE, "Press Space for single player!");
+			al_draw_text(scoreText, al_map_rgb(255, 255, 255), 640 / 2, (480 / 2), ALLEGRO_ALIGN_CENTRE, "Press ENTER for VS mode!");
 			al_flip_display();
 		}
 	}
@@ -167,93 +176,209 @@ int Game::MainMenu()
 }
 int Game::UpdateGame()
 {
-	while (!_gameOver)
+	if (!vsMode)
 	{
-		ALLEGRO_EVENT ev;
-		al_wait_for_event(event_queue, &ev);
-
-		if (ev.type == ALLEGRO_EVENT_TIMER)
+		while (!_gameOver)
 		{
-			player->Update(ev);
+			ALLEGRO_EVENT ev;
+			al_wait_for_event(event_queue, &ev);
 
-			//Update y colision enemigos
-			for (list<Enemy>::iterator iter = iterEnemyBegin; iter != iterEnemyEnd; iter++)
+			if (ev.type == ALLEGRO_EVENT_TIMER)
 			{
-				iter->Update(ev);
-				if (bounding_box_collision(player->GetX(), player->GetY(), player->GetWidht(), player->GetHeight(),
-					iter->GetX(), iter->GetY(), iter->GetWidht(), iter->GetHeight()))
+				player->Update(ev);
+
+				//Update y colision enemigos
+				for (list<Enemy>::iterator iter = iterEnemyBegin; iter != iterEnemyEnd; iter++)
 				{
-					if(player->CanDie())
-					player->OnDeath();
-					iter->Reset();
+					iter->Update(ev);
+					if (bounding_box_collision(player->GetX(), player->GetY(), player->GetWidht(), player->GetHeight(),
+						iter->GetX(), iter->GetY(), iter->GetWidht(), iter->GetHeight()))
+					{
+						if (player->CanDie())
+							player->OnDeath();
+						iter->Reset();
+					}
+					if (player->GetBullet()->GetAlive())
+						if (bounding_box_collision(player->GetBullet()->GetX(), player->GetBullet()->GetY(), player->GetBullet()->GetWidht(), player->GetBullet()->GetHeight()
+							, iter->GetX(), iter->GetY(), iter->GetWidht(), iter->GetHeight()))
+						{
+							player->GetBullet()->KillBullet();
+							AddScore();
+							iter->Reset();
+						}
+					if (pUp->Alive())
+					{
+						if (bounding_box_collision(player->GetX(), player->GetY(), player->GetWidht(), player->GetHeight(),
+							pUp->GetX(), pUp->GetY(), pUp->GetWidht(), pUp->GetHeight()))
+						{
+							pUp->ActivePower(player);
+							contaUpgrades = -200;
+						}
+					}
+
 				}
+				if (contaUpgrades < 360)
+				{
+					contaUpgrades++;
+				}
+				else
+				{
+					pUp->Spawn();
+					contaUpgrades = 0;
+				}
+				GameOver();
+				Difficulty();
+				redraw = true;
+			}
+			else if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
+			{
+				_gameOver = true;
+				_finalMenu = false;
+			}
+			else if (ev.type == ALLEGRO_EVENT_KEY_DOWN)
+			{
+				if (player)
+					player->Update(ev);
+				if (ev.keyboard.keycode == ALLEGRO_KEY_Z)
+				{
+					pUp->Spawn();
+				}
+			}
+			else if (ev.type == ALLEGRO_EVENT_KEY_UP)
+			{
+				if (player)
+					player->Update(ev);
+			}
+			if (redraw && al_is_event_queue_empty(event_queue))
+			{
+				redraw = false;
+
+				al_clear_to_color(al_map_rgb(0, 40, 0));
+				player->Draw();
+				pUp->Draw();
+				for (list<Enemy>::iterator iter = iterEnemyBegin; iter != iterEnemyEnd; iter++)
+				{
+					iter->Draw();
+				}
+				al_draw_text(scoreText, al_map_rgb(255, 255, 255), 70, 1, ALLEGRO_ALIGN_CENTRE, GetScore().c_str());
+				al_draw_text(livesText, al_map_rgb(255, 255, 255), 60, 40, ALLEGRO_ALIGN_CENTRE, player->GetLives().c_str());
+				al_flip_display();
+			}
+
+		}
+	}
+	else
+	{
+		while (!_gameOver)
+		{
+			ALLEGRO_EVENT ev;
+			al_wait_for_event(event_queue, &ev);
+
+			if (ev.type == ALLEGRO_EVENT_TIMER)
+			{
+				player->Update(ev);
+				secondPlayer->Update(ev);
+
+				//Colisiones
+				//1st player bala contra 2nd
 				if (player->GetBullet()->GetAlive())
+				{
 					if (bounding_box_collision(player->GetBullet()->GetX(), player->GetBullet()->GetY(), player->GetBullet()->GetWidht(), player->GetBullet()->GetHeight()
-						, iter->GetX(), iter->GetY(), iter->GetWidht(), iter->GetHeight()))
+						, secondPlayer->GetX(), secondPlayer->GetY(), secondPlayer->GetWidht(), secondPlayer->GetHeight()))
 					{
 						player->GetBullet()->KillBullet();
 						AddScore();
-						iter->Reset();
+						secondPlayer->OnDeath();
 					}
+				}
+				//2nd player bala contra 1st
+				if (secondPlayer->GetBullet()->GetAlive())
+				{
+					if (bounding_box_collision(secondPlayer->GetBullet()->GetX(), secondPlayer->GetBullet()->GetY(), secondPlayer->GetBullet()->GetWidht(), secondPlayer->GetBullet()->GetHeight()
+						, player->GetX(), player->GetY(), player->GetWidht(), player->GetHeight()))
+					{
+						secondPlayer->GetBullet()->KillBullet();
+						AddScore();
+						player->OnDeath();
+					}
+				}
+				//ambas balas
+				if (player->GetBullet()->GetAlive() && secondPlayer->GetBullet()->GetAlive())
+				{
+					if (bounding_box_collision(secondPlayer->GetBullet()->GetX(), secondPlayer->GetBullet()->GetY(), secondPlayer->GetBullet()->GetWidht(), secondPlayer->GetBullet()->GetHeight()
+						, player->GetBullet()->GetX(), player->GetBullet()->GetY(), player->GetBullet()->GetWidht(), player->GetBullet()->GetHeight()))
+					{
+						player->GetBullet()->KillBullet();
+						secondPlayer->GetBullet()->KillBullet();
+					}
+				}
 				if (pUp->Alive())
 				{
 					if (bounding_box_collision(player->GetX(), player->GetY(), player->GetWidht(), player->GetHeight(),
 						pUp->GetX(), pUp->GetY(), pUp->GetWidht(), pUp->GetHeight()))
 					{
 						pUp->ActivePower(player);
-						contaUpgrades = -200;
+						contaUpgrades = 0;
+					}
+					else if (bounding_box_collision(secondPlayer->GetX(), secondPlayer->GetY(), secondPlayer->GetWidht(), secondPlayer->GetHeight(),
+						pUp->GetX(), pUp->GetY(), pUp->GetWidht(), pUp->GetHeight()))
+					{
+						pUp->ActivePower(player);
+						contaUpgrades = 0;
 					}
 				}
-				
+				if (contaUpgrades < 360)
+				{
+					contaUpgrades++;
+				}
+				else
+				{
+					pUp->Spawn();
+					contaUpgrades = 0;
+				}
+				GameOver();				
+				redraw = true;
 			}
-			if (contaUpgrades < 360)
+			else if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
 			{
-				contaUpgrades++;				
+				_gameOver = true;
+				_finalMenu = false;
 			}
-			else
+			else if (ev.type == ALLEGRO_EVENT_KEY_DOWN)
 			{
-				pUp->Spawn();
-				contaUpgrades = 0;
+				if (player)
+					player->Update(ev);
+				if (secondPlayer)
+					secondPlayer->Update(ev);
+				if (ev.keyboard.keycode == ALLEGRO_KEY_Z)
+				{
+					pUp->Spawn();
+				}
 			}
-			GameOver();
-			Difficulty();
-			redraw = true;
-		}
-		else if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
-		{
-			_gameOver = true;
-			_finalMenu = false;
-		}
-		else if (ev.type == ALLEGRO_EVENT_KEY_DOWN)
-		{
-			if (player)
-				player->Update(ev);
-			if (ev.keyboard.keycode == ALLEGRO_KEY_Z)
+			else if (ev.type == ALLEGRO_EVENT_KEY_UP)
 			{
-				pUp->Spawn();
-			}				
-		}
-		else if (ev.type == ALLEGRO_EVENT_KEY_UP)
-		{
-			if (player)
-				player->Update(ev);
-		}
-		if (redraw && al_is_event_queue_empty(event_queue))
-		{
-			redraw = false;
+				if (player)
+					player->Update(ev);
+				if (secondPlayer)
+					secondPlayer->Update(ev);
+			}
+			if (redraw && al_is_event_queue_empty(event_queue))
+			{
+				redraw = false;
 
-			al_clear_to_color(al_map_rgb(0, 40, 0));
-			player->Draw();
-			pUp->Draw();
-			for (list<Enemy>::iterator iter = iterEnemyBegin; iter != iterEnemyEnd; iter++)
-			{
-				iter->Draw();
+				al_clear_to_color(al_map_rgb(0, 40, 0));
+				player->Draw();
+				pUp->Draw();
+				for (list<Enemy>::iterator iter = iterEnemyBegin; iter != iterEnemyEnd; iter++)
+				{
+					iter->Draw();
+				}
+				al_draw_text(scoreText, al_map_rgb(255, 255, 255), 70, 1, ALLEGRO_ALIGN_CENTRE, GetScore().c_str());
+				al_draw_text(livesText, al_map_rgb(255, 255, 255), 60, 40, ALLEGRO_ALIGN_CENTRE, player->GetLives().c_str());
+				al_flip_display();
 			}
-			al_draw_text(scoreText, al_map_rgb(255, 255, 255), 70, 1, ALLEGRO_ALIGN_CENTRE, GetScore().c_str());
-			al_draw_text(livesText, al_map_rgb(255, 255, 255), 60, 40, ALLEGRO_ALIGN_CENTRE, player->GetLives().c_str());
-			al_flip_display();
-		}
 
+		}
 	}
 	return 0;
 }
@@ -314,10 +439,28 @@ std::string Game::GetScore()
 }
 void Game::GameOver()
 {
-	if (player->Alive())
-		_gameOver = false;
+	if (!vsMode)
+	{
+		if (player->Alive())
+			_gameOver = false;
+		else
+			_gameOver = true;
+	}
 	else
-		_gameOver = true;
+	{
+		if (!player->Alive() || !secondPlayer->Alive())
+		{
+			if (!player->Alive() && secondPlayer->Alive())
+				winner = -1;
+			else if (player->Alive() && !secondPlayer->Alive())
+				winner = 1;
+			else
+				winner = 0;
+			_gameOver = true;
+		}
+		else
+			_gameOver = false;
+	}
 }
 void Game::Difficulty()
 {
